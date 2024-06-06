@@ -10,7 +10,6 @@ const Home = () => {
             <div className="home-links">
                 <a href="/register" className="home-link">Register</a>
                 <a href="/login" className="home-link">Login</a>
-                <a href="/login" className="home-link">Login</a>
             </div>
         </div>
     );
