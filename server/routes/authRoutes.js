@@ -1,19 +1,51 @@
 const express = require('express');
+const { Register } = require('../controllers/authController');
+const { Login } = require('../controllers/authController');
+const { Logout } = require('../controllers/authController');
+const Validate = require('../middleware/validate');
 const { check } = require('express-validator');
-const authController = require('../controllers/authController');
-const authMiddleware = require('../middleware/auth');
-
 const router = express.Router();
 
-router.post('/register', [
-  check('username', 'Username is required').not().isEmpty(),
-  check('email', 'Please include a valid email').isEmail(),
-  check('password', 'Password must be 6 or more characters').isLength({ min: 6 }),
-  check('role', 'Role must be either admin or user').isIn(['admin', 'user'])
-], authController.register);
+// Register route -- POST request
+router.post(
+    "/register",
+    [
+        check("email")
+            .isEmail()
+            .withMessage("Enter a valid email address")
+            .normalizeEmail(),
+        check("first_name")
+            .not()
+            .isEmpty()
+            .withMessage("Your first name is required")
+            .trim()
+            .escape(),
+        check("last_name")
+            .not()
+            .isEmpty()
+            .withMessage("Your last name is required")
+            .trim()
+            .escape(),
+        check("password")
+            .notEmpty()
+            .isLength({ min: 8 })
+            .withMessage("Must be at least 8 chars long")
+    ],
+    Validate,
+    Register
+);
 
-router.post('/login', authController.login);
+router.post(
+  "/login",
+  check("email")
+      .isEmail()
+      .withMessage("Enter a valid email address")
+      .normalizeEmail(),
+  check("password").not().isEmpty(),
+  Validate,
+  Login
+);
 
-router.post('/logout', authMiddleware, authController.logout);
+router.get('/logout', Logout);
 
 module.exports = router;
