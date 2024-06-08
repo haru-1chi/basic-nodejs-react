@@ -1,4 +1,3 @@
-// src/components/Login.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import './Login.css';
@@ -21,12 +20,20 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('/api/login', formData);
+            const res = await axios.post('http://localhost:8080/auth/login', formData);
             console.log('Login successful', res.data);
-            // Redirect to home page or dashboard
+
+            // Store user data in local storage
+            localStorage.setItem('user', JSON.stringify(res.data.user));
+
+            // Show success alert
+            alert('Login successful!');
+
+            // Redirect to home page
+            window.location.href = '/';
         } catch (err) {
-            console.error('Error during login', err.response.data);
-            setErrors(err.response.data.errors || {});
+            console.error('Error during login', err.response?.data || err.message);
+            setErrors(err.response?.data.errors || {});
         }
     };
 
