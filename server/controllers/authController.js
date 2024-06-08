@@ -54,43 +54,36 @@ exports.Register = async (req, res) => {
 };
 
 exports.Login = async (req, res) => {
-  // Get variables for the login process
   const { email } = req.body;
   try {
-      // Check if user exists
       const user = await User.findOne({ email }).select("+password");
-      if (!user)
+      if (!user) {
           return res.status(401).json({
               status: "failed",
               data: [],
               message: "Account does not exist",
           });
-      // if user exists
-      // validate password
-      const isPasswordValid = bcrypt.compare(
-          `${req.body.password}`,
-          user.password
-      );
-      // if not valid, return unathorized response
-      if (!isPasswordValid)
+      }
+      const isPasswordValid = bcrypt.compare(`${req.body.password}`, user.password);
+      if (!isPasswordValid) {
           return res.status(401).json({
               status: "failed",
               data: [],
-              message:
-                  "Invalid email or password. Please try again with the correct credentials.",
+              message: "Invalid email or password. Please try again with the correct credentials.",
           });
-
+      }
       let options = {
-          maxAge: 20 * 60 * 1000, // would expire in 20minutes
-          httpOnly: true, // The cookie is only accessible by the web server
+          maxAge: 20 * 60 * 1000, // 20 minutes
+          httpOnly: true,
           secure: true,
           sameSite: "None",
       };
-      const token = user.generateAccessJWT(); // generate session token for user
-      res.cookie("SessionID", token, options); // set the token to response header, so that the client sends it back on each subsequent request
+      const token = user.generateAccessJWT();
+      res.cookie("SessionID", token, options);
       res.status(200).json({
           status: "success",
           message: "You have successfully logged in.",
+          token // Return the token in the response body
       });
   } catch (err) {
       res.status(500).json({
@@ -102,6 +95,7 @@ exports.Login = async (req, res) => {
   }
   res.end();
 }
+
 
 exports.Logout = async (req, res) => {
   try {

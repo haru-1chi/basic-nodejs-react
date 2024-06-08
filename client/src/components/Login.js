@@ -20,14 +20,13 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://localhost:8080/auth/login', formData);
+            const res = await axios.post('http://localhost:8080/auth/login', formData, {
+                withCredentials: true
+            });
             console.log('Login successful', res.data);
 
-            // Store user data in local storage
-            localStorage.setItem('user', JSON.stringify(res.data.user));
-
-            // Show success alert
-            alert('Login successful!');
+            // Store token in localStorage
+            localStorage.setItem('token', res.data.token);
 
             // Redirect to home page
             window.location.href = '/';
