@@ -4,13 +4,15 @@ import './Register.css';
 
 const Register = () => {
     const [formData, setFormData] = useState({
-        username: '',
+        first_name: '',
+        last_name: '',
         email: '',
         password: '',
         confirmPassword: '' // Add confirmPassword field
     });
 
     const [errors, setErrors] = useState({});
+    const [successMessage, setSuccessMessage] = useState(''); // Add state for success message
 
     const handleChange = (e) => {
         setFormData({
@@ -26,27 +28,43 @@ const Register = () => {
             return;
         }
         try {
-            const res = await axios.post('/api/register', formData);
+            const {...submitData } = formData; // Remove confirmPassword before sending
+            console.log('Submitting data:', submitData); // Debugging statement
+            const res = await axios.post('http://localhost:8080/auth/register', submitData);
             console.log('Registration successful', res.data);
+            setSuccessMessage('Registration successful'); // Set success message
+            setErrors({}); // Clear any previous errors
         } catch (err) {
-            console.error('Error during registration', err.response.data);
-            setErrors(err.response.data.errors || {});
+            console.error('Error during registration', err.response?.data || err.message);
+            setErrors(err.response?.data.errors || {});
+            setSuccessMessage(''); // Clear success message if there's an error
         }
     };
 
     return (
         <div className="register-container">
             <h2>Register</h2>
+            {successMessage && <p className="success-text">{successMessage}</p>} {/* Display success message */}
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label>Username</label>
+                    <label>First Name</label>
                     <input
                         type="text"
-                        name="username"
-                        value={formData.username}
+                        name="first_name"
+                        value={formData.first_name}
                         onChange={handleChange}
                     />
-                    {errors.username && <p className="error-text">{errors.username}</p>}
+                    {errors.first_name && <p className="error-text">{errors.first_name}</p>}
+                </div>
+                <div className="form-group">
+                    <label>Last Name</label>
+                    <input
+                        type="text"
+                        name="last_name"
+                        value={formData.last_name}
+                        onChange={handleChange}
+                    />
+                    {errors.last_name && <p className="error-text">{errors.last_name}</p>}
                 </div>
                 <div className="form-group">
                     <label>Email</label>

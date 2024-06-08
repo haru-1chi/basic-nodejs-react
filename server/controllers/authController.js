@@ -4,17 +4,18 @@ const bcrypt = require('bcryptjs');
 
 exports.Register = async (req, res) => {
   // get required variables from request body
-  const { first_name, last_name, email, password } = req.body;
+  const { first_name, last_name, email, password, confirmPassword } = req.body;
+
+  // Check if passwords match
+  if (password !== confirmPassword) {
+    return res.status(400).json({
+      status: "failed",
+      data: [],
+      message: "Passwords do not match.",
+    });
+  }
 
   try {
-    // create an instance of a user
-    const newUser = new User({
-      first_name,
-      last_name,
-      email,
-      password,
-    });
-
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -24,6 +25,14 @@ exports.Register = async (req, res) => {
         message: "It seems you already have an account, please log in instead.",
       });
     }
+
+    // create an instance of a user
+    const newUser = new User({
+      first_name,
+      last_name,
+      email,
+      password,
+    });
 
     // Save new user into the database
     const savedUser = await newUser.save();
