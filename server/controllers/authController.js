@@ -64,7 +64,7 @@ exports.Login = async (req, res) => {
               message: "Account does not exist",
           });
       }
-      const isPasswordValid = bcrypt.compare(`${req.body.password}`, user.password);
+      const isPasswordValid = await bcrypt.compare(req.body.password, user.password);
       if (!isPasswordValid) {
           return res.status(401).json({
               status: "failed",
@@ -95,6 +95,7 @@ exports.Login = async (req, res) => {
   }
   res.end();
 }
+
 
 
 exports.Logout = async (req, res) => {

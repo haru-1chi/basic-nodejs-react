@@ -11,7 +11,15 @@ const app = express();
 
 // CONFIGURE HEADER INFORMATION
 // Allow request from any source. In real production, this should be limited to allowed origins only
-app.use(cors());
+// Configure CORS
+const corsOptions = {
+    origin: 'http://localhost:3000', // Specify the frontend origin
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+};
+
+app.use(cors(corsOptions));
+app.use(express.json()); // Parse JSON bodies
+
 app.disable("x-powered-by"); // Reduce fingerprinting
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
