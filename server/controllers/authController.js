@@ -1,16 +1,16 @@
 const User = require('../models/User');
+const Profile = require('../models/Profile');
 const Blacklist = require('../models/Blacklist');
 const bcrypt = require('bcryptjs');
 
 exports.Register = async (req, res) => {
   // get required variables from request body
-  const { first_name, last_name, email, password, confirmPassword } = req.body;
+  const { username, email, password, confirmPassword } = req.body;
 
   // Check if passwords match
   if (password !== confirmPassword) {
     return res.status(400).json({
       status: "failed",
-      data: [],
       message: "Passwords do not match.",
     });
   }
@@ -21,22 +21,31 @@ exports.Register = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         status: "failed",
-        data: [],
         message: "It seems you already have an account, please log in instead.",
       });
     }
 
     // create an instance of a user
     const newUser = new User({
-      first_name,
-      last_name,
+      username,
       email,
       password,
     });
 
     // Save new user into the database
     const savedUser = await newUser.save();
-    const { role, ...user_data } = savedUser._doc;
+
+    const newProfile = new Profile({
+      userId: savedUser._id,
+      first_name: '',
+      last_name: '',
+      birthday: '',
+      tel: '',
+      role: 'user' // default role
+    });
+    await newProfile.save();
+
+    const { ...user_data } = savedUser._doc;
 
     res.status(200).json({
       status: "success",
@@ -47,8 +56,7 @@ exports.Register = async (req, res) => {
     res.status(500).json({
       status: "error",
       code: 500,
-      data: [],
-      message:  err.message || "Internal Server Error",
+      message: err.message || "Internal Server Error",
     });
   }
 };
@@ -56,42 +64,39 @@ exports.Register = async (req, res) => {
 exports.Login = async (req, res) => {
   const { email } = req.body;
   try {
-      const user = await User.findOne({ email }).select("+password");
-      if (!user) {
-          return res.status(401).json({
-              status: "failed",
-              data: [],
-              message: "Account does not exist",
-          });
-      }
-      const isPasswordValid = await bcrypt.compare(req.body.password, user.password);
-      if (!isPasswordValid) {
-          return res.status(401).json({
-              status: "failed",
-              data: [],
-              message: "Invalid email or password. Please try again with the correct credentials.",
-          });
-      }
-      let options = {
-          maxAge: 20 * 60 * 1000, // 20 minutes
-          httpOnly: true,
-          secure: true,
-          sameSite: "None",
-      };
-      const token = user.generateAccessJWT();
-      res.cookie("SessionID", token, options);
-      res.status(200).json({
-          status: "success",
-          message: "You have successfully logged in.",
-          token // Return the token in the response body
+    const user = await User.findOne({ email }).select("+password");
+    if (!user) {
+      return res.status(401).json({
+        status: "failed",
+        message: "Account does not exist",
       });
+    }
+    const isPasswordValid = await bcrypt.compare(req.body.password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        status: "failed",
+        message: "Invalid email or password. Please try again with the correct credentials.",
+      });
+    }
+    let options = {
+      maxAge: 20 * 60 * 1000, // 20 minutes
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    };
+    const token = user.generateAccessJWT();
+    res.cookie("SessionID", token, options);
+    res.status(200).json({
+      status: "success",
+      message: "You have successfully logged in.",
+      token // Return the token in the response body
+    });
   } catch (err) {
-      res.status(500).json({
-          status: "error",
-          code: 500,
-          data: [],
-          message: err.message || "Internal Server Error",
-      });
+    res.status(500).json({
+      status: "error",
+      code: 500,
+      message: err.message || "Internal Server Error",
+    });
   }
   res.end();
 }

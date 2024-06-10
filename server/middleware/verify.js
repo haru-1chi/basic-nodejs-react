@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Profile = require("../models/Profile");
 const Blacklist = require('../models/Blacklist');
 const jwt = require("jsonwebtoken");
 const config = require("../config");
@@ -39,10 +40,18 @@ exports.Verify = async (req, res, next) => {
 exports.VerifyRole = async (req, res, next) => {
     try {
         const user = req.user; // we have access to the user object from the request
-        const { role } = user; // extract the user role
+        const profile = await Profile.findOne({ userId: user._id }); // fetch the profile using the userId
+        if (!profile) {
+            return res.status(404).json({
+                status: "failed",
+                message: "Profile not found.",
+            });
+        }
+        
+        const { role } = profile; // extract the user role
         // check if user has no advance privileges
         // return an unathorized response
-        if (role !== "0x88") {
+        if (role !== "admin") {
             return res.status(401).json({
                 status: "failed",
                 message: "You are not authorized to view this page.",
@@ -53,8 +62,8 @@ exports.VerifyRole = async (req, res, next) => {
         res.status(500).json({
             status: "error",
             code: 500,
-            data: [],
-            message: "Internal Server Error",
+
+            message: err.message || "Internal Server Error",
         });
     }
 }

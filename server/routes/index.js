@@ -11,7 +11,6 @@ app.get("/home", (req, res) => {
     try {
         res.status(200).json({
             status: "success",
-            data: [],
             message: "Welcome to our API homepage!",
         });
     } catch (err) {

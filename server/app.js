@@ -4,6 +4,8 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const { PORT, URI } = require('./config/index');
 const appRoutes = require('./routes/index');
+const profileRoutes = require('./routes/profileRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const dotenv = require('dotenv');
 dotenv.config();
 // === 1 - CREATE SERVER ===
@@ -40,7 +42,8 @@ mongoose
 // === 4 - CONFIGURE ROUTES ===
 // Connect Main route to app
 app.use(appRoutes);
-
+app.use(profileRoutes);
+app.use('/admin', adminRoutes);
 // === 5 - START UP SERVER ===
 app.listen(PORT, () =>
     console.log(`Server running on http://localhost:${PORT}`)
