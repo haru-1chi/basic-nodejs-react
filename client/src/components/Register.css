@@ -1,35 +1,35 @@
 .register-container {
-    width: 300px;
+    max-width: 500px;
     margin: 0 auto;
     padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+    background-color: #f4f4f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 h2 {
-    text-align: center;
+    color: #333;
+    font-size: 24px;
     margin-bottom: 20px;
+    text-align: center;
 }
 
 .form-group {
     margin-bottom: 15px;
 }
 
-.form-group label {
+label {
     display: block;
+    font-weight: bold;
     margin-bottom: 5px;
 }
 
-.form-group input {
+input {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
     box-sizing: border-box;
-}
-
-.error-text {
-    color: red;
-    font-size: 12px;
 }
 
 .submit-button {
@@ -38,36 +38,25 @@ h2 {
     background-color: #4CAF50;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
 }
 
 .submit-button:hover {
     background-color: #45a049;
 }
 
-.success-message {
-    text-align: center;
-    margin-top: 20px;
+.error-text {
+    color: #f44336;
+    font-size: 14px;
+    margin-top: 5px;
 }
 
-.success-message p {
-    color: green;
+.success-text {
+    color: #4CAF50;
     font-size: 16px;
-}
-
-.home-button {
-    display: inline-block;
-    padding: 10px 20px;
-    margin-top: 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-.home-button:hover {
-    background-color: #45a049;
+    margin-bottom: 15px;
+    text-align: center;
 }

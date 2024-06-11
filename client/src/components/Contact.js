@@ -9,7 +9,7 @@ const Contact = () => {
         message: ''
     });
 
-    const [errors, setErrors] = useState({});
+    const [errors] = useState({});
 
     const handleChange = (e) => {
         setFormData({

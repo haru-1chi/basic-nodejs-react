@@ -25,7 +25,7 @@ const Profile = () => {
                 setFormData({
                     first_name: res.data.data.first_name,
                     last_name: res.data.data.last_name,
-                    birthday: res.data.data.birthday.split('T')[0], // Convert to YYYY-MM-DD format
+                    birthday: res.data.data.birthday, // Convert to YYYY-MM-DD format
                     tel: res.data.data.tel
                 });
             } catch (err) {

@@ -2,18 +2,23 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './Register.css';
 import Navbar from './navbar';
+
 const Register = () => {
     const [formData, setFormData] = useState({
-        first_name: '',
-        last_name: '',
+        username: '',
         email: '',
         password: '',
-        confirmPassword: '' // Add confirmPassword field
+        confirmPassword: ''
     });
 
     const [errors, setErrors] = useState({});
-    const [successMessage, setSuccessMessage] = useState(''); // Add state for success message
+    const [successMessage, setSuccessMessage] = useState('');
 
+    // const validatePassword = (password) => {
+    //     const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
+    //     return passwordRegex.test(password);
+    // };
+    
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -21,30 +26,58 @@ const Register = () => {
         });
     };
 
+    const validateForm = () => {
+        let formErrors = {};
+
+        if (!formData.username) {
+            formErrors.username = "Your username is required";
+        } else if (formData.username.length > 25) {
+            formErrors.username = "Username cannot exceed 25 characters";
+        }
+
+        if (!formData.email) {
+            formErrors.email = "Your email is required";
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            formErrors.email = "Enter a valid email address";
+        }
+
+        if (!formData.password) {
+            formErrors.password = "Your password is required";
+        } else if (formData.password.length < 8) {
+            formErrors.password = "Password must be at least 8 characters long";
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            formErrors.confirmPassword = "Passwords do not match";
+        }
+
+        return formErrors;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (formData.password !== formData.confirmPassword) {
-            setErrors({ confirmPassword: "Passwords do not match" });
+
+        const formErrors = validateForm();
+        if (Object.keys(formErrors).length > 0) {
+            setErrors(formErrors);
             return;
         }
+
         try {
-            const { ...submitData } = formData; // Remove confirmPassword before sending
-            console.log('Submitting data:', submitData); // Debugging statement
+            const {...submitData } = formData;
             const res = await axios.post('http://localhost:8080/auth/register', submitData);
             console.log('Registration successful', res.data);
 
-            // Show success alert
             alert('Registration successful!');
 
-            // Redirect to login page
             window.location.href = '/login';
 
-            setSuccessMessage('Registration successful'); // Set success message
-            setErrors({}); // Clear any previous errors
+            setSuccessMessage('Registration successful');
+            setErrors({});
         } catch (err) {
             console.error('Error during registration', err.response?.data || err.message);
             setErrors(err.response?.data.errors || {});
-            setSuccessMessage(''); // Clear success message if there's an error
+            setSuccessMessage('');
         }
     };
 
@@ -52,27 +85,17 @@ const Register = () => {
         <div className="register-container">
             <Navbar />
             <h2>Register</h2>
-            {successMessage && <p className="success-text">{successMessage}</p>} {/* Display success message */}
+            {successMessage && <p className="success-text">{successMessage}</p>}
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label>First Name</label>
+                    <label>Username</label>
                     <input
                         type="text"
-                        name="first_name"
-                        value={formData.first_name}
+                        name="username"
+                        value={formData.username}
                         onChange={handleChange}
                     />
-                    {errors.first_name && <p className="error-text">{errors.first_name}</p>}
-                </div>
-                <div className="form-group">
-                    <label>Last Name</label>
-                    <input
-                        type="text"
-                        name="last_name"
-                        value={formData.last_name}
-                        onChange={handleChange}
-                    />
-                    {errors.last_name && <p className="error-text">{errors.last_name}</p>}
+                    {errors.username && <p className="error-text">{errors.username}</p>}
                 </div>
                 <div className="form-group">
                     <label>Email</label>
