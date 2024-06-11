@@ -17,7 +17,7 @@ const Navbar = () => {
                     });
                     setUser(res.data.data);
                 } catch (err) {
-                    console.error('Error fetching user data', err);
+                    console.error(err);
                 }
             }
         };

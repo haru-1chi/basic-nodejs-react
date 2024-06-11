@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './Login.css';
 import Navbar from './navbar';
+
 const Login = () => {
     const [formData, setFormData] = useState({
         email: '',
@@ -17,8 +18,31 @@ const Login = () => {
         });
     };
 
+    const validateForm = () => {
+        let formErrors = {};
+
+        if (!formData.email) {
+            formErrors.email = "Your email is required";
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            formErrors.email = "Enter a valid email address";
+        }
+
+        if (!formData.password) {
+            formErrors.password = "Your password is required";
+        }
+
+        return formErrors;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const formErrors = validateForm();
+        if (Object.keys(formErrors).length > 0) {
+            setErrors(formErrors);
+            return;
+        }
+
         try {
             const res = await axios.post('http://localhost:8080/auth/login', formData, {
                 withCredentials: true
@@ -32,14 +56,19 @@ const Login = () => {
             window.location.href = '/';
         } catch (err) {
             console.error('Error during login', err.response?.data || err.message);
-            setErrors(err.response?.data.errors || {});
+            if (err.response && err.response.status === 401) {
+                setErrors({ general: err.response.data.message });
+            } else {
+                setErrors(err.response?.data.errors || {});
+            }
         }
     };
 
     return (
         <div className="login-container">
-                        <Navbar />
+            <Navbar />
             <h2>Login</h2>
+            {errors.general && <p className="error-text">{errors.general}</p>}
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label>Email</label>
