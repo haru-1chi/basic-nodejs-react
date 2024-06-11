@@ -1,107 +1,133 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import './UserProfile.css';
-
-const UserProfile = () => {
-    const [formData, setFormData] = useState({
-        name: '',
-        birthDay: '',
-        picture: null
-    });
-
-    const [errors, setErrors] = useState({});
+import Navbar from './navbar';
+const Profile = () => {
     const [user, setUser] = useState(null);
+    const [formData, setFormData] = useState({
+        first_name: '',
+        last_name: '',
+        birthday: '',
+        tel: ''
+    });
+    const [editMode, setEditMode] = useState(false);
+    const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch user data when component mounts
         const fetchUserData = async () => {
             try {
-                const res = await axios.get('/api/user-profile');
-                setUser(res.data);
+                const res = await axios.get('http://localhost:8080/profile', {
+                    withCredentials: true
+                });
+                setUser(res.data.data);
                 setFormData({
-                    name: res.data.name || '',
-                    birthDay: res.data.birthDay || '',
-                    picture: null
+                    first_name: res.data.data.first_name,
+                    last_name: res.data.data.last_name,
+                    birthday: res.data.data.birthday.split('T')[0], // Convert to YYYY-MM-DD format
+                    tel: res.data.data.tel
                 });
             } catch (err) {
-                console.error('Error fetching user data', err.response.data);
+                console.error('Error fetching user data', err.response?.data || err.message);
+                if (err.response?.status === 401) {
+                    navigate('/login');
+                }
             }
         };
 
         fetchUserData();
-    }, []);
+    }, [navigate]);
 
     const handleChange = (e) => {
-        const { name, value, files } = e.target;
         setFormData({
             ...formData,
-            [name]: files ? files[0] : value
+            [e.target.name]: e.target.value
         });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const data = new FormData();
-        data.append('name', formData.name);
-        data.append('birthDay', formData.birthDay);
-        if (formData.picture) {
-            data.append('picture', formData.picture);
-        }
-
         try {
-            const res = await axios.post('/api/user-profile', data);
-            console.log('Profile update successful', res.data);
-            setUser(res.data);
+            const res = await axios.post('http://localhost:8080/updateprofile', formData, {
+                withCredentials: true
+            });
+            setUser(res.data.data);
+            setEditMode(false);
+            setErrors({});
         } catch (err) {
-            console.error('Error updating profile', err.response.data);
-            setErrors(err.response.data.errors || {});
+            console.error('Error updating profile', err.response?.data || err.message);
+            setErrors(err.response?.data.errors || {});
         }
     };
 
     return (
-        <div className="user-profile-container">
-            <h2>User Profile</h2>
-            <form onSubmit={handleSubmit} encType="multipart/form-data">
-                <div className="form-group">
-                    <label>Name</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                    />
-                    {errors.name && <p className="error-text">{errors.name}</p>}
+        <div className="profile-container">
+            <Navbar />
+            {user ? (
+                <div>
+                    <h2>User Profile</h2>
+                    <p>Role: {user.role}</p>
+                    {editMode ? (
+                        <form onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <label>First Name</label>
+                                <input
+                                    type="text"
+                                    name="first_name"
+                                    value={formData.first_name}
+                                    onChange={handleChange}
+                                />
+                                {errors.first_name && <p className="error-text">{errors.first_name}</p>}
+                            </div>
+                            <div className="form-group">
+                                <label>Last Name</label>
+                                <input
+                                    type="text"
+                                    name="last_name"
+                                    value={formData.last_name}
+                                    onChange={handleChange}
+                                />
+                                {errors.last_name && <p className="error-text">{errors.last_name}</p>}
+                            </div>
+                            <div className="form-group">
+                                <label>Birthday</label>
+                                <input
+                                    type="date"
+                                    name="birthday"
+                                    value={formData.birthday}
+                                    onChange={handleChange}
+                                />
+                                {errors.birthday && <p className="error-text">{errors.birthday}</p>}
+                            </div>
+                            <div className="form-group">
+                                <label>Tel</label>
+                                <input
+                                    type="text"
+                                    name="tel"
+                                    value={formData.tel}
+                                    onChange={handleChange}
+                                />
+                                {errors.tel && <p className="error-text">{errors.tel}</p>}
+                            </div>
+                            <button type="submit" className="submit-button">Save</button>
+                            <button type="button" className="cancel-button" onClick={() => setEditMode(false)}>Cancel</button>
+                        </form>
+                    ) : (
+                        <div>
+                            <p>First Name: {user.first_name}</p>
+                            <p>Last Name: {user.last_name}</p>
+                            <p>Birthday: {new Date(user.birthday).toLocaleDateString()}</p>
+                            <p>Tel: {user.tel}</p>
+                            <button onClick={() => setEditMode(true)}>Edit Profile</button>
+                        </div>
+                    )}
                 </div>
-                <div className="form-group">
-                    <label>Birthday</label>
-                    <input
-                        type="date"
-                        name="birthDay"
-                        value={formData.birthDay}
-                        onChange={handleChange}
-                    />
-                    {errors.birthDay && <p className="error-text">{errors.birthDay}</p>}
-                </div>
-                <div className="form-group">
-                    <label>Profile Picture</label>
-                    <input
-                        type="file"
-                        name="picture"
-                        onChange={handleChange}
-                    />
-                    {errors.picture && <p className="error-text">{errors.picture}</p>}
-                </div>
-                <button type="submit" className="submit-button">Update Profile</button>
-            </form>
-            {user && user.pictureUrl && (
-                <div className="profile-picture-container">
-                    <h3>Current Profile Picture</h3>
-                    <img src={user.pictureUrl} alt="Profile" className="profile-picture" />
-                </div>
+            ) : (
+                <p>Loading...</p>
             )}
         </div>
     );
 };
 
-export default UserProfile;
+export default Profile;

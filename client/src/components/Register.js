@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './Register.css';
-
+import Navbar from './navbar';
 const Register = () => {
     const [formData, setFormData] = useState({
         first_name: '',
@@ -28,7 +28,7 @@ const Register = () => {
             return;
         }
         try {
-            const {...submitData} = formData; // Remove confirmPassword before sending
+            const { ...submitData } = formData; // Remove confirmPassword before sending
             console.log('Submitting data:', submitData); // Debugging statement
             const res = await axios.post('http://localhost:8080/auth/register', submitData);
             console.log('Registration successful', res.data);
@@ -50,6 +50,7 @@ const Register = () => {
 
     return (
         <div className="register-container">
+            <Navbar />
             <h2>Register</h2>
             {successMessage && <p className="success-text">{successMessage}</p>} {/* Display success message */}
             <form onSubmit={handleSubmit}>

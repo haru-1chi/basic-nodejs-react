@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './Login.css';
-
+import Navbar from './navbar';
 const Login = () => {
     const [formData, setFormData] = useState({
         email: '',
@@ -38,6 +38,7 @@ const Login = () => {
 
     return (
         <div className="login-container">
+                        <Navbar />
             <h2>Login</h2>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">

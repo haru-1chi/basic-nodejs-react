@@ -11,11 +11,11 @@ const Navbar = () => {
             const token = localStorage.getItem('token');
             if (token) {
                 try {
-                    const res = await axios.get('http://localhost:8080/user', {
+                    const res = await axios.get('http://localhost:8080/profile', {
                         headers: { 'Authorization': `Bearer ${token}` },
                         withCredentials: true
                     });
-                    setUser(res.data.user);
+                    setUser(res.data.data);
                 } catch (err) {
                     console.error('Error fetching user data', err);
                 }
@@ -40,11 +40,20 @@ const Navbar = () => {
         <nav className="navbar">
             <div className="navbar-container">
                 <Link to="/" className="navbar-logo">Home</Link>
-                {user && (
+                {user ? (
                     <div className="navbar-user">
-                        <span>Welcome, {user.first_name} {user.last_name}</span>
-                        <span>Role: {user.role}</span>
-                        <button onClick={handleLogout}>Logout</button>
+                        <span>Welcome, {user.username}</span>
+                        <Link to="/userprofile" className="navbar-link">Profile</Link>
+                        {user.role === 'admin' && (
+                            <Link to="/manage-users" className="navbar-link">Manage Users</Link>
+                        )}
+                        <button onClick={handleLogout} className="navbar-button">Logout</button>
+                    </div>
+                ) : (
+                    <div className="navbar-guest">
+                        <Link to="/register" className="navbar-link">Register</Link>
+                        <Link to="/login" className="navbar-link">Login</Link>
+                        
                     </div>
                 )}
             </div>

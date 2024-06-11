@@ -5,6 +5,7 @@ import Register from './components/Register';
 import Login from './components/Login';
 import Home from './components/Home';
 import UserProfile from './components/UserProfile';
+import ManageUsers from './components/ManageUsers';
 import Contact from './components/Contact';
 function App() {
     return (
@@ -14,6 +15,7 @@ function App() {
                     <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/userprofile" element={<UserProfile />} />
+                    <Route path="/manage-users" element={<ManageUsers />} />
                     <Route path="/Contact" element={<Contact />} />
                     <Route path="/" element={<Home />} />
                     

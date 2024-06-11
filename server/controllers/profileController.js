@@ -70,6 +70,7 @@ const getProfileWithFields = async (userId) => {
         
         const result = {
             _id: profile._id,
+            username: profile.userId.username,
             first_name: profile.first_name,
             last_name: profile.last_name,
             birthday: profile.birthday,
