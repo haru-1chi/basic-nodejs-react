@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import DOMPurify from 'dompurify'; // Import DOMPurify
 import './UserProfile.css';
 import Navbar from './navbar';
+
 const Profile = () => {
     const [user, setUser] = useState(null);
     const [formData, setFormData] = useState({
@@ -67,7 +69,7 @@ const Profile = () => {
             {user ? (
                 <div>
                     <h2>User Profile</h2>
-                    <p>Role: {user.role}</p>
+                    <p>Role: {DOMPurify.sanitize(user.role)}</p> {/* Sanitize user role */}
                     {editMode ? (
                         <form onSubmit={handleSubmit}>
                             <div className="form-group">
@@ -115,10 +117,10 @@ const Profile = () => {
                         </form>
                     ) : (
                         <div>
-                            <p>First Name: {user.first_name}</p>
-                            <p>Last Name: {user.last_name}</p>
-                            <p>Birthday: {new Date(user.birthday).toLocaleDateString()}</p>
-                            <p>Tel: {user.tel}</p>
+                            <p>First Name: {DOMPurify.sanitize(user.first_name)}</p> {/* Sanitize first name */}
+                            <p>Last Name: {DOMPurify.sanitize(user.last_name)}</p> {/* Sanitize last name */}
+                            <p>Birthday: {DOMPurify.sanitize(new Date(user.birthday).toLocaleDateString())}</p> {/* Sanitize and format birthday */}
+                            <p>Tel: {DOMPurify.sanitize(user.tel)}</p> {/* Sanitize telephone number */}
                             <button onClick={() => setEditMode(true)}>Edit Profile</button>
                         </div>
                     )}
