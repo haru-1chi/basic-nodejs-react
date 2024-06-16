@@ -1,7 +1,7 @@
-const mongoose = require('mongoose')
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { SECRET_ACCESS_TOKEN } = require('../config/index.js');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { SECRET_ACCESS_TOKEN } = require("../config/index.js");
 const UserSchema = new mongoose.Schema(
   {
     username: {
@@ -22,13 +22,13 @@ const UserSchema = new mongoose.Schema(
       select: false,
       max: 25,
     },
+    verified: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
 
 UserSchema.pre("save", function (next) {
   const user = this;
-
 
   if (!user.isModified("password")) return next();
   bcrypt.genSalt(10, (err, salt) => {
@@ -48,7 +48,7 @@ UserSchema.methods.generateAccessJWT = function () {
     id: this._id,
   };
   return jwt.sign(payload, SECRET_ACCESS_TOKEN, {
-    expiresIn: '20m',
+    expiresIn: "20m",
   });
 };
 

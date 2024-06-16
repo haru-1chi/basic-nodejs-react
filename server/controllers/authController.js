@@ -1,7 +1,10 @@
 const User = require('../models/User');
 const Profile = require('../models/Profile');
+const Token = require("../models/Token");
 const Blacklist = require('../models/Blacklist');
 const bcrypt = require('bcryptjs');
+const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
 
 exports.Register = async (req, res) => {
   // get required variables from request body
@@ -47,6 +50,13 @@ exports.Register = async (req, res) => {
 
     const { ...user_data } = savedUser._doc;
 
+    const token = await new Token({
+      userId: user._id,
+      token: crypto.randomBytes(32).toString("hex"),
+    }).save();
+    const url = `${process.env.BASE_URL}users/${user.id}/verify/${token.token}`;
+    await sendEmail(user.email, "Verify Email", url);
+
     res.status(200).json({
       status: "success",
       data: [user_data],
@@ -71,6 +81,7 @@ exports.Login = async (req, res) => {
         message: "Account does not exist",
       });
     }
+
     const isPasswordValid = await bcrypt.compare(req.body.password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -78,6 +89,23 @@ exports.Login = async (req, res) => {
         message: "Invalid email or password. Please try again with the correct credentials.",
       });
     }
+
+    if (!user.verified) {
+      let token = await Token.findOne({ userId: user._id });
+      if (!token) {
+        token = await new Token({
+          userId: user._id,
+          token: crypto.randomBytes(32).toString("hex"),
+        }).save();
+        const url = `${process.env.BASE_URL}users/${user.id}/verify/${token.token}`;
+        await sendEmail(user.email, "Verify Email", url);
+      }
+  
+      return res
+        .status(400)
+        .send({ message: "An Email sent to your account please verify" });
+    }
+  
     let options = {
       maxAge: 20 * 60 * 1000, // 20 minutes
       httpOnly: true,
@@ -128,3 +156,23 @@ exports.Logout = async (req, res) => {
   }
   res.end();
 }
+
+exports.verifyEmail = async (req, res) => {
+  try {
+		const user = await User.findOne({ _id: req.params.id });
+		if (!user) return res.status(400).send({ message: "Invalid link" });
+
+		const token = await Token.findOne({
+			userId: user._id,
+			token: req.params.token,
+		});
+		if (!token) return res.status(400).send({ message: "Invalid link" });
+
+		await User.updateOne({ _id: user._id, verified: true });
+		await token.remove();
+
+		res.status(200).send({ message: "Email verified successfully" });
+	} catch (error) {
+		res.status(500).send({ message: "Internal Server Error" });
+	}
+};
