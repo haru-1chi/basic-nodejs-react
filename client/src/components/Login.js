@@ -67,31 +67,33 @@ const Login = () => {
     return (
         <div className="login-container">
             <Navbar />
-            <h2>Login</h2>
-            {errors.general && <p className="error-text">{errors.general}</p>}
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label>Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                    />
-                    {errors.email && <p className="error-text">{errors.email}</p>}
-                </div>
-                <div className="form-group">
-                    <label>Password</label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                    />
-                    {errors.password && <p className="error-text">{errors.password}</p>}
-                </div>
-                <button type="submit" className="submit-button">Login</button>
-            </form>
+            <div className="login-content">
+                <h2>Login</h2>
+                {errors.general && <p className="error-text">{errors.general}</p>}
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label>Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                        />
+                        {errors.email && <p className="error-text">{errors.email}</p>}
+                    </div>
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                        />
+                        {errors.password && <p className="error-text">{errors.password}</p>}
+                    </div>
+                    <button type="submit" className="submit-button">Login</button>
+                </form>
+            </div>
         </div>
     );
 };

@@ -1,7 +1,8 @@
 /* General Styles */
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f9;
 }
 
 /* Navbar Styles */
@@ -12,6 +13,10 @@ body {
     align-items: center;
     padding: 10px 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
 }
 
 .navbar-container {
@@ -28,14 +33,10 @@ body {
     margin-right: auto;
 }
 
-.navbar-user {
+.navbar-user,
+.navbar-guest {
     display: flex;
     align-items: center;
-}
-
-.navbar-user span {
-    color: white;
-    margin-right: 15px;
 }
 
 .navbar-link {
@@ -72,9 +73,17 @@ body {
         align-items: flex-start;
     }
 
-    .navbar-user {
+    .navbar-user,
+    .navbar-guest {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .navbar-link,
+    .navbar-button {
+        margin-bottom: 10px;
+        width: 100%;
+        text-align: center;
     }
 
     .navbar-user span {

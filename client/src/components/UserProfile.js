@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import DOMPurify from 'dompurify'; // Import DOMPurify
+import DOMPurify from 'dompurify';
 import './UserProfile.css';
 import Navbar from './navbar';
 
@@ -27,7 +27,7 @@ const Profile = () => {
                 setFormData({
                     first_name: res.data.data.first_name,
                     last_name: res.data.data.last_name,
-                    birthday: res.data.data.birthday, // Convert to YYYY-MM-DD format
+                    birthday: res.data.data.birthday,
                     tel: res.data.data.tel
                 });
             } catch (err) {
@@ -67,9 +67,9 @@ const Profile = () => {
         <div className="profile-container">
             <Navbar />
             {user ? (
-                <div>
+                <div className="profile-content">
                     <h2>User Profile</h2>
-                    <p>Role: {DOMPurify.sanitize(user.role)}</p> {/* Sanitize user role */}
+                    <p>Role: {DOMPurify.sanitize(user.role)}</p>
                     {editMode ? (
                         <form onSubmit={handleSubmit}>
                             <div className="form-group">
@@ -112,15 +112,15 @@ const Profile = () => {
                                 />
                                 {errors.tel && <p className="error-text">{errors.tel}</p>}
                             </div>
+                            {/* <button type="button" className="cancel-button" onClick={() => setEditMode(false)}>Cancel</button> */}
                             <button type="submit" className="submit-button">Save</button>
-                            <button type="button" className="cancel-button" onClick={() => setEditMode(false)}>Cancel</button>
                         </form>
                     ) : (
                         <div>
-                            <p>First Name: {DOMPurify.sanitize(user.first_name)}</p> {/* Sanitize first name */}
-                            <p>Last Name: {DOMPurify.sanitize(user.last_name)}</p> {/* Sanitize last name */}
-                            <p>Birthday: {DOMPurify.sanitize(new Date(user.birthday).toLocaleDateString())}</p> {/* Sanitize and format birthday */}
-                            <p>Tel: {DOMPurify.sanitize(user.tel)}</p> {/* Sanitize telephone number */}
+                            <p>First Name: {DOMPurify.sanitize(user.first_name)}</p>
+                            <p>Last Name: {DOMPurify.sanitize(user.last_name)}</p>
+                            <p>Birthday: {DOMPurify.sanitize(new Date(user.birthday).toLocaleDateString())}</p>
+                            <p>Tel: {DOMPurify.sanitize(user.tel)}</p>
                             <button onClick={() => setEditMode(true)}>Edit Profile</button>
                         </div>
                     )}

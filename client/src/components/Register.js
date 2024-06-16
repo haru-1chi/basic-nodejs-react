@@ -14,7 +14,7 @@ const Register = () => {
     const [errors, setErrors] = useState({});
     const [successMessage, setSuccessMessage] = useState('');
 
-    // const validatePassword = (password) => {
+     // const validatePassword = (password) => {
     //     const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
     //     return passwordRegex.test(password);
     // };
@@ -84,51 +84,53 @@ const Register = () => {
     return (
         <div className="register-container">
             <Navbar />
-            <h2>Register</h2>
-            {successMessage && <p className="success-text">{successMessage}</p>}
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label>Username</label>
-                    <input
-                        type="text"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleChange}
-                    />
-                    {errors.username && <p className="error-text">{errors.username}</p>}
-                </div>
-                <div className="form-group">
-                    <label>Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                    />
-                    {errors.email && <p className="error-text">{errors.email}</p>}
-                </div>
-                <div className="form-group">
-                    <label>Password</label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                    />
-                    {errors.password && <p className="error-text">{errors.password}</p>}
-                </div>
-                <div className="form-group">
-                    <label>Confirm Password</label>
-                    <input
-                        type="password"
-                        name="confirmPassword"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                    />
-                    {errors.confirmPassword && <p className="error-text">{errors.confirmPassword}</p>}
-                </div>
-                <button type="submit" className="submit-button">Register</button>
-            </form>
+            <div className="register-content">
+                <h2>Register</h2>
+                {successMessage && <p className="success-text">{successMessage}</p>}
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label>Username</label>
+                        <input
+                            type="text"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                        />
+                        {errors.username && <p className="error-text">{errors.username}</p>}
+                    </div>
+                    <div className="form-group">
+                        <label>Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                        />
+                        {errors.email && <p className="error-text">{errors.email}</p>}
+                    </div>
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                        />
+                        {errors.password && <p className="error-text">{errors.password}</p>}
+                    </div>
+                    <div className="form-group">
+                        <label>Confirm Password</label>
+                        <input
+                            type="password"
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                        />
+                        {errors.confirmPassword && <p className="error-text">{errors.confirmPassword}</p>}
+                    </div>
+                    <button type="submit" className="submit-button">Register</button>
+                </form>
+            </div>
         </div>
     );
 };

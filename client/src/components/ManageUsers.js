@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './ManageUsers.css';
 import Navbar from './navbar';
+
 const ManageUsers = () => {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState('');
@@ -39,17 +40,19 @@ const ManageUsers = () => {
 
     return (
         <div className="manage-users-container">
-                        <Navbar />
-            <h2>Manage Users</h2>
-            {error && <p className="error-text">{error}</p>}
-            <ul>
-                {users.map(user => (
-                    <li key={user.profile.userId}>
-                        <span>{user.profile.first_name} {user.profile.last_name} ({user.profile.username})</span>
-                        <button onClick={() => handleDelete(user.profile.userId)} className="delete-button">Delete</button>
-                    </li>
-                ))}
-            </ul>
+            <Navbar />
+            <div className="content">
+                <h2>Manage Users</h2>
+                {error && <p className="error-text">{error}</p>}
+                <ul>
+                    {users.map(user => (
+                        <li key={user.profile.userId}>
+                            <span>{user.profile.first_name} {user.profile.last_name} ({user.profile.username})</span>
+                            <button onClick={() => handleDelete(user.profile.userId)} className="delete-button">Delete</button>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     );
 };
