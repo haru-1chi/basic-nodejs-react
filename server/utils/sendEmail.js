@@ -5,13 +5,13 @@ const User = require('../models/User');
 module.exports = async (email, subject, text) => {
 	try {
 		const transporter = nodemailer.createTransport({
-			host: process.env.HOST,
-			service: process.env.SERVICE,
-			port: Number(process.env.EMAIL_PORT),
-			secure: Boolean(process.env.SECURE),
+			host: "smtp.gmail.com",
+			service: "gmail",
+			port: Number(587),
+			secure: Boolean(true),
 			auth: {
-				user: process.env.USER,
-				pass: process.env.PASS,
+				user: "jarunee.recc2@gmail.com",
+				pass: "qhmudyxtbzczejwi",
 			},
 		});
 
