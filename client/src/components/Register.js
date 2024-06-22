@@ -14,11 +14,11 @@ const Register = () => {
     const [errors, setErrors] = useState({});
     const [successMessage, setSuccessMessage] = useState('');
 
-     // const validatePassword = (password) => {
+    // const validatePassword = (password) => {
     //     const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
     //     return passwordRegex.test(password);
     // };
-    
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -64,7 +64,7 @@ const Register = () => {
         }
 
         try {
-            const {...submitData } = formData;
+            const { ...submitData } = formData;
             const res = await axios.post('http://localhost:8080/auth/register', submitData);
             console.log('Registration successful', res.data);
 
@@ -128,7 +128,7 @@ const Register = () => {
                         />
                         {errors.confirmPassword && <p className="error-text">{errors.confirmPassword}</p>}
                     </div>
-                    <button type="submit" className="submit-button">Register</button>
+                    <button type="submit" className="submit-button">Sign up</button>
                 </form>
             </div>
         </div>

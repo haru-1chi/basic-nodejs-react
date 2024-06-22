@@ -39,7 +39,7 @@ const Navbar = () => {
     return (
         <nav className="navbar">
             <div className="navbar-container">
-                <Link to="/" className="navbar-logo">Home</Link>
+                <Link to="/" className="navbar-logo">User's playground</Link>
                 {user ? (
                     <div className="navbar-user">
                         <span>Welcome, {user.username}</span>
@@ -51,9 +51,9 @@ const Navbar = () => {
                     </div>
                 ) : (
                     <div className="navbar-guest">
-                        <Link to="/register" className="navbar-link">Register</Link>
+                        <Link to="/" className="navbar-link">Home</Link>
+                        <Link to="/register" className="navbar-link">Sign up</Link>
                         <Link to="/login" className="navbar-link">Login</Link>
-                        
                     </div>
                 )}
             </div>

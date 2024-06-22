@@ -7,7 +7,7 @@ body {
 
 /* Navbar Styles */
 .navbar {
-    background-color: #4CAF50;
+    background-color: #03AED2;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -29,7 +29,6 @@ body {
     color: white;
     font-size: 24px;
     text-decoration: none;
-    font-weight: bold;
     margin-right: auto;
 }
 

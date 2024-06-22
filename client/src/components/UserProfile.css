@@ -11,6 +11,8 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 20px;
+    height: 100vh;
+    background-color: #FEEFAD;
 }
 
 .profile-content {
@@ -21,38 +23,60 @@ body {
     max-width: 600px;
     width: 100%;
     margin-top: 60px; /* To avoid overlap with the fixed navbar */
+    text-align: center; /* Center content */
 }
 
-h2 {
-    text-align: center;
-    color: #4CAF50;
+.img-username {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 20px;
 }
 
-p {
-    font-size: 16px;
-    line-height: 1.5;
-    margin: 10px 0;
+.img-username img {
+    width: 100px;
+    height: 100px;
+    background-color: #00c4cc;
+    border-radius: 50%;
+    margin-bottom: 10px;
 }
 
-.form-group {
+.profile-data {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
 }
 
-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
+.profile-data p {
+    flex: 1;
+    text-align: left;
+    margin: 0;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
 }
 
 input[type="text"],
 input[type="date"] {
-    width: calc(100% - 22px); /* full width minus padding */
-    padding: 10px;
+    flex: 1;
+    padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
     font-size: 16px;
+    margin-right: 10px;
 }
 
 .error-text {
@@ -62,8 +86,7 @@ input[type="date"] {
 }
 
 .submit-button,
-.cancel-button,
-button {
+.cancel-button {
     display: inline-block;
     padding: 10px 20px;
     font-size: 16px;
@@ -92,28 +115,22 @@ button {
     background-color: #d32f2f;
 }
 
-button {
-    background-color: #007bff;
-    color: white;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-/* Responsive Design */
 @media (max-width: 768px) {
     .profile-content {
         padding: 20px;
     }
 
+    .profile-data {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
     input[type="text"],
     input[type="date"] {
         width: 100%;
+        margin-bottom: 10px;
     }
 
-    .submit-button,
-    .cancel-button,
     button {
         width: 100%;
         margin-bottom: 10px;

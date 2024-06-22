@@ -10,6 +10,8 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 20px;
+    height: 100vh;
+    background-color: #FEEFAD;
 }
 
 .register-content {
@@ -22,8 +24,8 @@ body {
     margin-top: 60px; /* To avoid overlap with the fixed navbar */
 }
 
-h2 {
-    color: #333;
+.register-content h2 {
+    color: #03AED2;
     font-size: 2em;
     margin-bottom: 20px;
     text-align: center;
@@ -33,27 +35,29 @@ h2 {
     margin-bottom: 20px;
 }
 
-label {
+.register-content label {
+    color: #03AED2;
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
+    
 }
 
-input {
+.form-group input {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid #68D2E8;
+    border-radius: 40px;
     box-sizing: border-box;
 }
 
 .submit-button {
-    width: 100%;
+    max-width: auto;
     padding: 15px;
-    background-color: #4CAF50;
+    background-color: #68D2E8;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 40px;
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s ease;
