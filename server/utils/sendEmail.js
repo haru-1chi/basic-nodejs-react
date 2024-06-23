@@ -1,17 +1,17 @@
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const User = require('../models/User');
-
+const { HOST, SERVICE, EMAIL_PORT, SECURE, USER, PASS } = require('../config/index');
 module.exports = async (email, subject, text) => {
 	try {
 		const transporter = nodemailer.createTransport({
-			host: "smtp.gmail.com",
-			service: "gmail",
-			port: Number(587),
-			secure: Boolean(true),
+			host: HOST,
+			service: SERVICE,
+			port: Number(EMAIL_PORT),
+			secure: Boolean(SECURE),
 			auth: {
-				user: "jarunee.recc2@gmail.com",
-				pass: "qhmudyxtbzczejwi",
+				user: USER,
+				pass: PASS,
 			},
 		});
 
