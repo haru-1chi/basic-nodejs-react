@@ -1,6 +1,8 @@
 const express = require('express');
 const authRoutes = require('./authRoutes');
-const { Verify, VerifyRole } = require('../middleware/verify');
+const adminRoutes = require('./adminRoutes');
+const profileRoutes = require('./profileRoutes');
+// const { Verify, VerifyRole } = require('../middleware/verify');
 const app = express();
 
 app.disable("x-powered-by"); // Reduce fingerprinting (optional)
@@ -21,22 +23,24 @@ app.get("/home", (req, res) => {
     }
 });
 
-app.get("/user", Verify, (req, res) => {
-    res.status(200).json({
-        status: "success",
-        message: "Welcome to the your Dashboard!",
-        user: req.user // Return user data
-    });
-});
+// app.get("/user", Verify, (req, res) => {
+//     res.status(200).json({
+//         status: "success",
+//         message: "Welcome to the your Dashboard!",
+//         user: req.user // Return user data
+//     });
+// });
 
-app.get("/admin", Verify, VerifyRole, (req, res) => {
-    res.status(200).json({
-        status: "success",
-        message: "Welcome to the Admin portal!",
-    });
-});
+// app.get("/admin", Verify, VerifyRole, (req, res) => {
+//     res.status(200).json({
+//         status: "success",
+//         message: "Welcome to the Admin portal!",
+//     });
+// });
 
 // Use auth routes
 app.use('/auth', authRoutes);
+app.use('/user', profileRoutes);
+app.use('/admin', adminRoutes);
 
 module.exports = app;

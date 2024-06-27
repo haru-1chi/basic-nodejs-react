@@ -6,9 +6,7 @@ const { PORT, URI } = require('./config/index');
 const appRoutes = require('./routes/index');
 const profileRoutes = require('./routes/profileRoutes');
 const adminRoutes = require('./routes/adminRoutes');
-const dotenv = require('dotenv');
 const helmet = require('helmet');
-dotenv.config();
 // === 1 - CREATE SERVER ===
 const app = express();
 
