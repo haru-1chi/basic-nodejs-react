@@ -60,7 +60,7 @@ exports.Register = async (req, res) => {
     res.status(200).json({
       status: "success",
       data: [user_data],
-      message: "Thank you for registering with us. Your account has been successfully created.",
+      message: "Please verify email.",
     });
   } catch (err) {
     res.status(500).json({

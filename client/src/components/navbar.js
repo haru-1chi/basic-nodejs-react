@@ -8,7 +8,7 @@ const Navbar = () => {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('token'); //เปรียบเทียบที่อยู่การเก็บ token
             if (token) {
                 try {
                     const res = await axios.get('http://localhost:8080/profile', {
@@ -44,9 +44,11 @@ const Navbar = () => {
                     <div className="navbar-user">
                         <span>Welcome, {user.username}</span>
                         <Link to="/userprofile" className="navbar-link">Profile</Link>
+                        
                         {user.role === 'admin' && (
                             <Link to="/manage-users" className="navbar-link">Manage Users</Link>
                         )}
+
                         <button onClick={handleLogout} className="navbar-button">Logout</button>
                     </div>
                 ) : (
