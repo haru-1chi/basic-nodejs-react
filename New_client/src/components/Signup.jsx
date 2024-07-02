@@ -11,6 +11,7 @@ const Signup = () => {
     });
 
     const [errors, setErrors] = useState({});
+    const [successMessage, setSuccessMessage] = useState('');
 
     const handleChange = (e) => {
         setFormData({
@@ -65,11 +66,8 @@ const Signup = () => {
             const res = await axios.post('http://localhost:8080/auth/register', submitData);
             console.log('Registration successful', res.data);
 
-            alert('Registration successful!');
+            setSuccessMessage('Registration successful! We sent a verification email to you. Please check your mail and verify.');
 
-            window.location.href = '/login';
-
-            setSuccessMessage('Registration successful');
             setErrors({});
         } catch (err) {
             console.error('Error during registration', err.response?.data || err.message);
@@ -85,7 +83,7 @@ const Signup = () => {
                 <h1 className='text-4xl text-[#03AED2] text-center mb-6'>Sign up</h1>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group mb-4">
-                        <label htmlFor="" className="block text-xl text-[#03AED2] mb-1">Username</label>
+                        <label className="block text-xl text-[#03AED2] mb-1">Username</label>
                         <input type="text"
                             name='username'
                             className="mt-1 p-2 pl-3 border border-[#68D2E8] rounded-full w-full"
@@ -95,7 +93,7 @@ const Signup = () => {
                         {errors.username && <p className="error-text">{errors.username}</p>}
                     </div>
                     <div className="form-group mb-4">
-                        <label htmlFor="" className="block text-xl text-[#03AED2] mb-1">E-mail</label>
+                        <label className="block text-xl text-[#03AED2] mb-1">E-mail</label>
                         <input type="email"
                             name='email'
                             className="mt-1 p-2 pl-3 border border-[#68D2E8] rounded-full w-full"
@@ -105,7 +103,7 @@ const Signup = () => {
                     </div>
 
                     <div className="form-group mb-4">
-                        <label htmlFor="" className="block text-xl text-[#03AED2] mb-1">Password</label>
+                        <label className="block text-xl text-[#03AED2] mb-1">Password</label>
                         <input type="password"
                             name='password'
                             className="mt-1 p-2 pl-3 border border-[#68D2E8] rounded-full w-full"
@@ -115,7 +113,7 @@ const Signup = () => {
                     </div>
 
                     <div className="form-group mb-4">
-                        <label htmlFor="" className="block text-xl text-[#03AED2] mb-1">Confirm Password</label>
+                        <label className="block text-xl text-[#03AED2] mb-1">Confirm Password</label>
                         <input type="password"
                             name='confirmPassword'
                             className="mt-1 p-2 pl-3 border border-[#68D2E8] rounded-full w-full"
@@ -123,7 +121,7 @@ const Signup = () => {
                             onChange={handleChange} />
                         {errors.confirmPassword && <p className="error-text">{errors.confirmPassword}</p>}
                     </div>
-
+                    {successMessage && <p className="success-text">{successMessage}</p>}
                     <div className="btn-submit mt-6 max-w-lg w-full flex justify-center">
                         <button type='submit' className='submit-button bg-[#68D2E8] text-xl text-white rounded-full py-2 px-8'>Sign up</button>
                     </div>
