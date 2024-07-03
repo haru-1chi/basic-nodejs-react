@@ -45,7 +45,7 @@ function Navbar() {
                     {user ? (
                         <div className="menu">
                             <ul className="menus flex items-center text-white text-2xl mr-20">
-                                <li className='ml-10'><Link to="" className="">Home</Link></li>
+                                <li className='ml-10'><Link to="/" className="">Home</Link></li>
                                 {user.role === 'admin' && (
                                     <Link to="/manage-users" className="navbar-link">Manage Users</Link>
                                 )}
@@ -57,7 +57,7 @@ function Navbar() {
                     ) : (
                         <div className="menu">
                             <ul className="menus flex items-center text-white text-2xl mr-20">
-                                <li className='ml-10'><Link to="/userprofile" className="">Home</Link></li>
+                                <li className='ml-10'><Link to="/" className="">Home</Link></li>
                                 <li className='ml-10'><Link to="/signup" className="">Sign up</Link></li>
                                 <li className='ml-10'><Link to="/login" className="">Login</Link></li>
                             </ul>

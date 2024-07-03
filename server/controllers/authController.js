@@ -1,10 +1,11 @@
-const User = require('../models/User');
-const Profile = require('../models/Profile');
+const User = require("../models/User");
+const Profile = require("../models/Profile");
 const Token = require("../models/Token");
-const Blacklist = require('../models/Blacklist');
-const bcrypt = require('bcryptjs');
+const Blacklist = require("../models/Blacklist");
+const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
+const juice = require("juice");
 
 exports.Register = async (req, res) => {
   // get required variables from request body
@@ -40,11 +41,11 @@ exports.Register = async (req, res) => {
 
     const newProfile = new Profile({
       userId: savedUser._id,
-      first_name: '',
-      last_name: '',
-      birthday: '',
-      tel: '',
-      role: 'user' // default role
+      first_name: "",
+      last_name: "",
+      birthday: "",
+      tel: "",
+      role: "user", // default role
     });
     await newProfile.save();
 
@@ -54,8 +55,12 @@ exports.Register = async (req, res) => {
       userId: savedUser._id,
       token: crypto.randomBytes(32).toString("hex"),
     }).save();
+
     const url = `http://localhost:8080/auth/users/${newUser.id}/verify/${token.token}`;
-    await sendEmail(newUser.email, "Verify Email", url);
+    const inlinedHtml = juice(
+      emailTemplate.replace("{{verificationUrl}}", url)
+    );
+    await sendEmail(newUser.email, "Verify Email", inlinedHtml);
 
     res.status(200).json({
       status: "success",
@@ -82,11 +87,15 @@ exports.Login = async (req, res) => {
       });
     }
 
-    const isPasswordValid = await bcrypt.compare(req.body.password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
     if (!isPasswordValid) {
       return res.status(401).json({
         status: "failed",
-        message: "Invalid email or password. Please try again with the correct credentials.",
+        message:
+          "Invalid email or password. Please try again with the correct credentials.",
       });
     }
 
@@ -100,12 +109,12 @@ exports.Login = async (req, res) => {
         const url = `${process.env.BASE_URL}users/${user.id}/verify/${token.token}`;
         await sendEmail(user.email, "Verify Email", url);
       }
-  
+
       return res
         .status(400)
         .send({ message: "An Email sent to your account please verify" });
     }
-  
+
     let options = {
       maxAge: 20 * 60 * 1000, // 20 minutes
       httpOnly: true,
@@ -117,7 +126,7 @@ exports.Login = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "You have successfully logged in.",
-      token // Return the token in the response body
+      token, // Return the token in the response body
     });
   } catch (err) {
     res.status(500).json({
@@ -127,16 +136,14 @@ exports.Login = async (req, res) => {
     });
   }
   res.end();
-}
-
-
+};
 
 exports.Logout = async (req, res) => {
   try {
-    const authHeader = req.headers['cookie'];
+    const authHeader = req.headers["cookie"];
     if (!authHeader) return res.sendStatus(204);
-    const cookie = authHeader.split('=')[1];
-    const accessToken = cookie.split(';')[0];
+    const cookie = authHeader.split("=")[1];
+    const accessToken = cookie.split(";")[0];
     const checkIfBlacklisted = await Blacklist.findOne({ token: accessToken });
 
     if (checkIfBlacklisted) return res.sendStatus(204);
@@ -145,17 +152,17 @@ exports.Logout = async (req, res) => {
       token: accessToken,
     });
     await newBlacklist.save();
-    
-    res.setHeader('Clear-Site-Data', '"cookies"');
-    res.status(200).json({ message: 'You are logged out!' });
+
+    res.setHeader("Clear-Site-Data", '"cookies"');
+    res.status(200).json({ message: "You are logged out!" });
   } catch (err) {
     res.status(500).json({
-      status: 'error',
-      message: 'Internal Server Error',
+      status: "error",
+      message: "Internal Server Error",
     });
   }
   res.end();
-}
+};
 
 exports.verifyEmail = async (req, res) => {
   try {
@@ -171,8 +178,95 @@ exports.verifyEmail = async (req, res) => {
     await User.updateOne({ _id: user._id }, { verified: true });
     await Token.deleteOne({ _id: token._id });
 
-    res.status(200).send({ message: "Email verified successfully" });
+    res.redirect('http://localhost:5173/verified');
   } catch (error) {
     res.status(500).send({ message: error.message || "Internal Server Error" });
   }
 };
+
+const emailTemplate = `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    * {
+    margin: auto; 
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+.Formail-page{
+    background-color: #FEEFAD;
+    height: 100vh;
+    max-width: 640px;
+}
+
+.mail-head{
+    background-color: #03AED2;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mail-head h1{
+    font-size: 36px;
+    color: white;
+    font-weight: semi-bold;
+}
+
+.mail-body{
+    background-color: white;
+    max-width: 540px;
+    margin-top: 50px;
+    padding: 50px;
+    border-radius: 20px;
+    box-shadow: 3px 3px 5px #00000025;
+}
+
+.content h2{
+    font-size: 28px;
+    color: #03AED2;
+    font-weight: semi-bold;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.content p{
+    color: #03AED2;
+    margin-bottom: 25px;
+}
+
+.btn-submit{
+    max-width: fit-content;
+    padding: 10px 15px;
+    background-color: #68D2E8;
+    border-radius: 50px;
+}
+
+.btn-submit a{
+    font-size: 18px;
+    color: white;
+    font-weight: semi-bold;
+}
+  </style>
+</head>
+<body>
+<div style="background-color: #FEEFAD; height: 100vh; max-width: 640px;">
+    <div style="background-color: #03AED2; height: 150px; display: flex; justify-content: center; align-items: center;">
+      <h1 style="font-size: 36px; color: white; font-weight: 600;">Welcome to User's Playground</h1>
+    </div>
+    <div style="background-color: white; max-width: 540px; margin-top: 50px; padding: 50px; border-radius: 20px; box-shadow: 3px 3px 5px #00000025;">
+      <div class="content">
+        <h2 style="font-size: 28px; color: #03AED2; font-weight: 600; text-align: center; margin-bottom: 25px;">Email Verification</h2>
+        <p style="color: #03AED2; margin-bottom: 25px;">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</p>
+      </div>
+      <div style="max-width: fit-content; padding: 10px 15px; background-color: #68D2E8; border-radius: 50px;">
+        <a href="{{verificationUrl}}" style="font-size: 18px; color: white; font-weight: 600;">Verify Email</a>
+      </div>
+    </div>
+  </div>
+  </body>
+  </html>
+`;

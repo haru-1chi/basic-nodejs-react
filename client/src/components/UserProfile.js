@@ -38,10 +38,7 @@ const Profile = () => {
           tel: res.data.data.tel,
         });
       } catch (err) {
-        console.error(
-          "Error fetching user data",
-          err.response?.data || err.message
-        );
+        console.error("Error fetching user data", err.response?.data || err.message);
         if (err.response?.status === 401) {
           navigate("/login");
         }
@@ -59,16 +56,25 @@ const Profile = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault(); //edit
     try {
+      const token = localStorage.getItem("token");
       const res = await axios.post(
         "http://localhost:8080/updateprofile",
         formData,
         {
+          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         }
       );
       setUser(res.data.data);
+      setFormData({//edit
+        username: res.data.data.username,
+        first_name: res.data.data.first_name,
+        last_name: res.data.data.last_name,
+        birthday: res.data.data.birthday,
+        tel: res.data.data.tel,
+      });
       setEditMode({
         first_name: false,
         last_name: false,
@@ -77,15 +83,16 @@ const Profile = () => {
       });
       setErrors({});
     } catch (err) {
-      console.error(
-        "Error updating profile",
-        err.response?.data || err.message
-      );
+      console.error("Error updating profile", err.response?.data || err.message);
       setErrors(err.response?.data.errors || {});
     }
   };
 
-  const toggleEditMode = (field) => {
+  const toggleEditMode = async (field) => {
+    if (editMode[field]) {
+      // If we are exiting the edit mode, submit the form
+      await handleSubmit();
+    }
     setEditMode((prevState) => ({
       ...prevState,
       [field]: !prevState[field],
@@ -114,15 +121,10 @@ const Profile = () => {
               ) : (
                 <p>{DOMPurify.sanitize(user.first_name)}</p>
               )}
-              <button
-                type="button"
-                onClick={() => toggleEditMode("first_name")}
-              >
+              <button type="button" onClick={() => toggleEditMode("first_name")}>
                 {editMode.first_name ? "Save" : "Edit"}
               </button>
-              {errors.first_name && (
-                <p className="error-text">{errors.first_name}</p>
-              )}
+              {errors.first_name && <p className="error-text">{errors.first_name}</p>}
             </div>
             <div className="profile-data">
               <p>Last Name</p>
@@ -136,15 +138,10 @@ const Profile = () => {
               ) : (
                 <p>{DOMPurify.sanitize(user.last_name)}</p>
               )}
-              <button
-                type="button"
-                onClick={() => toggleEditMode("last_name")}
-              >
+              <button type="button" onClick={() => toggleEditMode("last_name")}>
                 {editMode.last_name ? "Save" : "Edit"}
               </button>
-              {errors.last_name && (
-                <p className="error-text">{errors.last_name}</p>
-              )}
+              {errors.last_name && <p className="error-text">{errors.last_name}</p>}
             </div>
             <div className="profile-data">
               <p>Birthday</p>
@@ -158,15 +155,10 @@ const Profile = () => {
               ) : (
                 <p>{DOMPurify.sanitize(new Date(user.birthday).toLocaleDateString())}</p>
               )}
-              <button
-                type="button"
-                onClick={() => toggleEditMode("birthday")}
-              >
+              <button type="button" onClick={() => toggleEditMode("birthday")}>
                 {editMode.birthday ? "Save" : "Edit"}
               </button>
-              {errors.birthday && (
-                <p className="error-text">{errors.birthday}</p>
-              )}
+              {errors.birthday && <p className="error-text">{errors.birthday}</p>}
             </div>
             <div className="profile-data">
               <p>Tel</p>

@@ -1,8 +1,6 @@
 const nodemailer = require('nodemailer');
-const crypto = require('crypto');
-const User = require('../models/User');
 const { HOST, SERVICE, EMAIL_PORT, SECURE, USER, PASS } = require('../config/index');
-module.exports = async (email, subject, text) => {
+module.exports = async (email, subject, htmlContent) => {
 	try {
 		const transporter = nodemailer.createTransport({
 			host: HOST,
@@ -19,7 +17,7 @@ module.exports = async (email, subject, text) => {
 			from: process.env.USER,
 			to: email,
 			subject: subject,
-			text: text,
+			html: htmlContent,
 		});
 		console.log("email sent successfully");
 	} catch (error) {

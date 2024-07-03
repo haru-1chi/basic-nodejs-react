@@ -6,6 +6,7 @@ import Home from './components/Home';
 import Signup from './components/Signup';
 import Login from './components/Login';
 import Userprofile from './components/Userprofile';
+import Verified from './components/Verifiedmail';
 
 //components
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/userprofile" element={<Userprofile />} />
+          <Route path="/verified" element={<Verified />} />
         </Routes>
       </div>
     </Router>

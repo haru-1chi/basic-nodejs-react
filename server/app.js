@@ -14,7 +14,7 @@ const app = express();
 // Allow request from any source. In real production, this should be limited to allowed origins only
 // Configure CORS
 const corsOptions = {
-    origin: 'http://localhost:5173', // Specify the frontend origin
+    origin: 'http://localhost:3000', // Specify the frontend origin
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 };
 

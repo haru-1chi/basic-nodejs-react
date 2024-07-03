@@ -49,10 +49,8 @@ const Login = () => {
             });
             console.log('Login successful', res.data);
 
-            // Store token in localStorage
             localStorage.setItem('token', res.data.token);
 
-            // Redirect to home page
             window.location.href = '/';
         } catch (err) {
             console.error('Error during login', err.response?.data || err.message);
