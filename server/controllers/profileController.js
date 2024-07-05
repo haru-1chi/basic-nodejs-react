@@ -34,7 +34,7 @@ exports.updateProfile = async (req, res) => {
             { userId },
             { first_name, last_name, birthday, tel, role },
             { new: true, runValidators: true }
-        );
+        ).populate('userId', 'username');;
 
         if (!updatedProfile) {
             return res.status(404).json({
@@ -45,7 +45,10 @@ exports.updateProfile = async (req, res) => {
 
         res.status(200).json({
             status: "success",
-            data: updatedProfile
+            data: {
+                ...updatedProfile.toObject(),
+                username: updatedProfile.userId.username
+            }
         });
     } catch (err) {
         res.status(500).json({

@@ -7,6 +7,9 @@ import Signup from './components/Signup';
 import Login from './components/Login';
 import Userprofile from './components/Userprofile';
 import Verified from './components/Verifiedmail';
+import Forgetpassword from './components/ForgetPassword/Forgetpassword';
+import Resetpassword from './components/ForgetPassword/Resetpassword';
+import Resetsuccess from './components/ForgetPassword/Resetsuccess';
 
 //components
 
@@ -22,6 +25,9 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/userprofile" element={<Userprofile />} />
           <Route path="/verified" element={<Verified />} />
+          <Route path="/forgetpassword" element={<Forgetpassword />} />
+          <Route path="/resetpassword" element={<Resetpassword />} />
+          <Route path="/resetsuccess" element={<Resetsuccess />} />
         </Routes>
       </div>
     </Router>

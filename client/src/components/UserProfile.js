@@ -14,13 +14,9 @@ const Profile = () => {
     birthday: "",
     tel: "",
   });
-  const [editMode, setEditMode] = useState({
-    first_name: false,
-    last_name: false,
-    birthday: false,
-    tel: false,
-  });
+  const [isEditMode, setIsEditMode] = useState(false); //
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false); //
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,7 +34,10 @@ const Profile = () => {
           tel: res.data.data.tel,
         });
       } catch (err) {
-        console.error("Error fetching user data", err.response?.data || err.message);
+        console.error(
+          "Error fetching user data",
+          err.response?.data || err.message
+        );
         if (err.response?.status === 401) {
           navigate("/login");
         }
@@ -56,7 +55,8 @@ const Profile = () => {
   };
 
   const handleSubmit = async (e) => {
-    if (e) e.preventDefault(); //edit
+    e.preventDefault();
+    setIsSubmitting(true); //
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
@@ -68,35 +68,28 @@ const Profile = () => {
         }
       );
       setUser(res.data.data);
-      setFormData({//edit
+      setFormData({
         username: res.data.data.username,
         first_name: res.data.data.first_name,
         last_name: res.data.data.last_name,
         birthday: res.data.data.birthday,
         tel: res.data.data.tel,
       });
-      setEditMode({
-        first_name: false,
-        last_name: false,
-        birthday: false,
-        tel: false,
-      });
+      setIsEditMode(false); //
       setErrors({});
     } catch (err) {
-      console.error("Error updating profile", err.response?.data || err.message);
+      console.error(
+        "Error updating profile",
+        err.response?.data || err.message
+      );
       setErrors(err.response?.data.errors || {});
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const toggleEditMode = async (field) => {
-    if (editMode[field]) {
-      // If we are exiting the edit mode, submit the form
-      await handleSubmit();
-    }
-    setEditMode((prevState) => ({
-      ...prevState,
-      [field]: !prevState[field],
-    }));
+  const toggleEditMode = () => {
+    setIsEditMode((prev) => !prev);
   };
 
   return (
@@ -111,7 +104,7 @@ const Profile = () => {
           <form onSubmit={handleSubmit}>
             <div className="profile-data">
               <p>First Name</p>
-              {editMode.first_name ? (
+              {isEditMode ? (
                 <input
                   type="text"
                   name="first_name"
@@ -121,14 +114,13 @@ const Profile = () => {
               ) : (
                 <p>{DOMPurify.sanitize(user.first_name)}</p>
               )}
-              <button type="button" onClick={() => toggleEditMode("first_name")}>
-                {editMode.first_name ? "Save" : "Edit"}
-              </button>
-              {errors.first_name && <p className="error-text">{errors.first_name}</p>}
+              {errors.first_name && (
+                <p className="error-text">{errors.first_name}</p>
+              )}
             </div>
             <div className="profile-data">
               <p>Last Name</p>
-              {editMode.last_name ? (
+              {isEditMode ? (
                 <input
                   type="text"
                   name="last_name"
@@ -138,14 +130,13 @@ const Profile = () => {
               ) : (
                 <p>{DOMPurify.sanitize(user.last_name)}</p>
               )}
-              <button type="button" onClick={() => toggleEditMode("last_name")}>
-                {editMode.last_name ? "Save" : "Edit"}
-              </button>
-              {errors.last_name && <p className="error-text">{errors.last_name}</p>}
+              {errors.last_name && (
+                <p className="error-text">{errors.last_name}</p>
+              )}
             </div>
             <div className="profile-data">
               <p>Birthday</p>
-              {editMode.birthday ? (
+              {isEditMode ? (
                 <input
                   type="date"
                   name="birthday"
@@ -153,16 +144,19 @@ const Profile = () => {
                   onChange={handleChange}
                 />
               ) : (
-                <p>{DOMPurify.sanitize(new Date(user.birthday).toLocaleDateString())}</p>
+                <p>
+                  {DOMPurify.sanitize(
+                    new Date(user.birthday).toLocaleDateString()
+                  )}
+                </p>
               )}
-              <button type="button" onClick={() => toggleEditMode("birthday")}>
-                {editMode.birthday ? "Save" : "Edit"}
-              </button>
-              {errors.birthday && <p className="error-text">{errors.birthday}</p>}
+              {errors.birthday && (
+                <p className="error-text">{errors.birthday}</p>
+              )}
             </div>
             <div className="profile-data">
               <p>Tel</p>
-              {editMode.tel ? (
+              {isEditMode ? (
                 <input
                   type="text"
                   name="tel"
@@ -172,11 +166,16 @@ const Profile = () => {
               ) : (
                 <p>{DOMPurify.sanitize(user.tel)}</p>
               )}
-              <button type="button" onClick={() => toggleEditMode("tel")}>
-                {editMode.tel ? "Save" : "Edit"}
-              </button>
               {errors.tel && <p className="error-text">{errors.tel}</p>}
             </div>
+            <button type="button" onClick={toggleEditMode}>
+              {isEditMode ? "Cancel" : "Edit Profile"}
+            </button>
+            {isEditMode && (
+              <button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Saving..." : "Save Changes"}
+              </button>
+            )}
           </form>
         </div>
       ) : (
