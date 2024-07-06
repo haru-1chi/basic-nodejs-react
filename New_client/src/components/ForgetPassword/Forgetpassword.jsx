@@ -7,7 +7,7 @@ function Forgetpassword() {
     });
 
     const [errors, setErrors] = useState({});
-
+    const [successMessage, setSuccessMessage] = useState('');
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -24,10 +24,6 @@ function Forgetpassword() {
             formErrors.email = "Enter a valid email address";
         }
 
-        if (!formData.password) {
-            formErrors.password = "Your password is required";
-        }
-
         return formErrors;
     };
 
@@ -41,23 +37,16 @@ function Forgetpassword() {
         }
 
         try {
-            const res = await axios.post('http://localhost:8080/auth/login', formData, {
+            const res = await axios.post('http://localhost:8080/auth/forgetpassword', formData, {
                 withCredentials: true
             });
-            console.log('Login successful', res.data);
+            console.log('send reset-password successful', res.data);
+            setSuccessMessage('We sent a reset password request email to you! Please check your mail and verify.');
 
-            // Store token in localStorage
-            localStorage.setItem('token', res.data.token);
-
-            // Redirect to home page
-            window.location.href = '/';
         } catch (err) {
-            console.error('Error during login', err.response?.data || err.message);
-            if (err.response && err.response.status === 401) {
-                setErrors({ general: err.response.data.message });
-            } else {
-                setErrors(err.response?.data.errors || {});
-            }
+            console.error(err.response?.data || err.message);
+            setErrors(err.response?.data.errors || {});
+            setSuccessMessage('');
         }
     };
 
@@ -65,7 +54,6 @@ function Forgetpassword() {
         <div className='forget-page mt-12'>
             <div className="content bg-white w-[550px] rounded-2xl py-8 px-16 shadow-lg">
                 <h1 className='text-4xl text-[#03AED2] text-center mb-6'>Reset Password</h1>
-
                 <form onSubmit={handleSubmit}>
                     <div className="form-group mb-4">
                         <label className="block text-xl text-[#03AED2] mb-1">E-mail</label>
@@ -76,7 +64,7 @@ function Forgetpassword() {
                             className="mt-1 p-2 pl-3 border border-[#68D2E8] rounded-full w-full" />
                         {errors.email && <p className="error-text">{errors.email}</p>}
                     </div>
-                    {errors.general && <p className="error-text">{errors.general}</p>}
+                    {successMessage && <p className="success-text">{successMessage}</p>}
                     <div className="btn-submit mt-6 max-w-lg w-full flex justify-center">
                         <button type='submit' className='submit-button bg-[#68D2E8] text-xl text-white rounded-full py-2 px-8'>Send Password Reset Link</button>
                     </div>

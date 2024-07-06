@@ -6,7 +6,7 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
 const juice = require("juice");
-
+const url = require('url');
 exports.Register = async (req, res) => {
   // get required variables from request body
   const { username, email, password, confirmPassword } = req.body;
@@ -202,12 +202,10 @@ exports.forgetPassword = async (req, res) => {
     }).save();
 
     const url = `http://localhost:8080/auth/users/${user._id}/reset-password/${token.token}`;
-
-    await sendEmail(
-      user.email,
-      "Password Reset",
-      `Click the following link to reset your password: ${url}`
+    const inlinedHtml = juice(
+      tokenemail.replace("{{resetPasswordUrl}}", url)
     );
+    await sendEmail(user.email, "Reset Password", inlinedHtml);
 
     res.status(200).json({
       status: "success",
@@ -220,6 +218,83 @@ exports.forgetPassword = async (req, res) => {
     });
   }
 };
+
+exports.verifyPasswordReset = async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.params.id });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid link" });
+    }
+
+    const token = await Token.findOne({
+      userId: user._id,
+      token: req.params.token,
+    });
+    if (!token) {
+      return res.status(400).json({ message: "Invalid link" });
+    }
+
+    res.redirect(url.format({
+      pathname: "http://localhost:5173/resetpassword",
+      query: {
+        email: user.email,
+        token: req.params.token
+      }
+    }));
+
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Internal Server Error" });
+  }
+};
+
+
+exports.resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password, confirmPassword } = req.body;
+
+  try {
+    const resetToken = await Token.findOne({ token });
+    if (!resetToken) {
+      return res.status(400).json({
+        status: "failed",
+        message: "Invalid or expired password reset token.",
+      });
+    }
+
+    const user = await User.findById(resetToken.userId);
+    if (!user) {
+      return res.status(400).json({
+        status: "failed",
+        message: "User not found.",
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        status: "failed",
+        message: "Passwords do not match.",
+      });
+    }
+
+    // Update the user's password directly without rehashing
+    user.password = password;
+    await user.save();
+
+    // Remove the token after successful password reset
+    await Token.deleteOne({ _id: resetToken._id });
+
+    res.status(200).json({
+      status: "success",
+      message: "Password reset successfully.",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+
 
 const verifiedemail = `
 <!DOCTYPE html>
@@ -383,11 +458,11 @@ const tokenemail = `
     </div>
     <div style="background-color: white; max-width: 540px; margin-top: 50px; padding: 50px; border-radius: 20px; box-shadow: 3px 3px 5px #00000025;">
       <div class="content">
-        <h2 style="font-size: 28px; color: #03AED2; font-weight: 600; text-align: center; margin-bottom: 25px;">Email Verification</h2>
-        <p style="color: #03AED2; margin-bottom: 25px;">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</p>
+        <h2 style="font-size: 28px; color: #03AED2; font-weight: 600; text-align: center; margin-bottom: 25px;">Forgot Your Password?</h2>
+        <p style="color: #03AED2; margin-bottom: 25px;">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
       </div>
       <div style="max-width: fit-content; padding: 10px 15px; background-color: #68D2E8; border-radius: 50px;">
-        <a href="{{verificationUrl}}" style="font-size: 18px; color: white; font-weight: 600;">Verify Email</a>
+        <a href="{{resetPasswordUrl}}" style="font-size: 18px; color: white; font-weight: 600;">Reset Password</a>
       </div>
     </div>
   </div>

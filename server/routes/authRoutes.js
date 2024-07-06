@@ -4,6 +4,9 @@ const {
   verifyEmail,
   Login,
   Logout,
+  forgetPassword,
+  verifyPasswordReset,
+  resetPassword
 } = require("../controllers/authController");
 const Validate = require("../middleware/validate");
 const { check } = require("express-validator");
@@ -46,5 +49,19 @@ router.post(
 router.get("/logout", Logout);
 
 router.get("/users/:id/verify/:token/", verifyEmail);
+
+router.post(
+  "/forgetpassword",
+  check("email")
+    .isEmail()
+    .withMessage("Enter a valid email address")
+    .normalizeEmail(),
+  Validate,
+  forgetPassword
+);
+
+router.get("/users/:id/reset-password/:token/", verifyPasswordReset);
+
+router.post('/users/:token/reset-password',Validate, resetPassword);
 
 module.exports = router;
