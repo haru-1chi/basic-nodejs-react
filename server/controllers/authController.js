@@ -7,11 +7,10 @@ const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
 const juice = require("juice");
 const url = require('url');
+
 exports.Register = async (req, res) => {
-  // get required variables from request body
   const { username, email, password, confirmPassword } = req.body;
 
-  // Check if passwords match
   if (password !== confirmPassword) {
     return res.status(400).json({
       status: "failed",
@@ -20,7 +19,6 @@ exports.Register = async (req, res) => {
   }
 
   try {
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -29,14 +27,12 @@ exports.Register = async (req, res) => {
       });
     }
 
-    // create an instance of a user
     const newUser = new User({
       username,
       email,
       password,
     });
 
-    // Save new user into the database
     const savedUser = await newUser.save();
 
     const newProfile = new Profile({
@@ -45,7 +41,7 @@ exports.Register = async (req, res) => {
       last_name: "",
       birthday: "",
       tel: "",
-      role: "user", // default role
+      role: "user",
     });
     await newProfile.save();
 
@@ -276,11 +272,9 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
-    // Update the user's password directly without rehashing
     user.password = password;
     await user.save();
 
-    // Remove the token after successful password reset
     await Token.deleteOne({ _id: resetToken._id });
 
     res.status(200).json({

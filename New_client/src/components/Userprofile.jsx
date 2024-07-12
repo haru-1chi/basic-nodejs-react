@@ -107,78 +107,78 @@ function Userprofile() {
     return (
         <div className='Userprofile-page mt-12'>
             {user ? (
-                <div className="content bg-white w-[550px] rounded-2xl py-8 px-16 shadow-lg">
+                <div className="content bg-white dark:bg-[#3D2C8D] w-[550px] rounded-2xl py-8 px-16 shadow-lg">
                     <div className="head-profile flex flex-col items-center justify-center">
                         <img src={ProfilePic} alt="" className='w-28 rounded-full mt-6 mb-4' />
-                        <p className='text-2xl text-[#03AED2] mb-6'>@{DOMPurify.sanitize(user.username)}</p>
+                        <p className='text-2xl text-[#03AED2] dark:text-[#C996CC] mb-6'>@{DOMPurify.sanitize(user.username)}</p>
                     </div>
                     <form onSubmit={handleSubmit} className="body-profile">
                         <div className="data-profile grid grid-cols-2 mb-8 flex items-center">
-                            <label className='block text-xl text-[#03AED2]'>Firstname</label>
+                            <label className='block text-xl text-[#03AED2] dark:text-[#C996CC]'>Firstname</label>
                             {isEditMode ? (
                                 <input
                                     type="text"
                                     name="first_name"
                                     value={formData.first_name}
-                                    className="p-1 pl-3 border border-[#68D2E8] rounded-full w-full text-xl text-[#03AED2]"
+                                    className="p-1 pl-3 border border-[#68D2E8] dark:border-[#C996CC] rounded-full w-full text-xl text-[#03AED2] dark:text-[#C996CC]"
                                     onChange={handleChange}
                                 />
                             ) : (
-                                <p className='block text-xl text-[#03AED2]'>{DOMPurify.sanitize(user.first_name)}</p>
+                                <p className='block text-xl text-[#03AED2] dark:text-[#C996CC]'>{DOMPurify.sanitize(user.first_name)}</p>
                             )}
                             {errors.first_name && <p className="error-text">{errors.first_name}</p>}
                         </div>
                         <div className="data-profile grid grid-cols-2 mb-8 flex items-center">
-                            <label className='block text-xl text-[#03AED2]'>Lastname</label>
+                            <label className='block text-xl text-[#03AED2] dark:text-[#C996CC]'>Lastname</label>
                             {isEditMode ? (
                                 <input
                                     type="text"
                                     name="last_name"
                                     value={formData.last_name}
-                                    className="p-1 pl-3 border border-[#68D2E8] rounded-full w-full text-xl text-[#03AED2]"
+                                    className="p-1 pl-3 border border-[#68D2E8] dark:border-[#C996CC] rounded-full w-full text-xl text-[#03AED2] dark:text-[#C996CC]"
                                     onChange={handleChange}
                                 />
                             ) : (
-                                <p className='block text-xl text-[#03AED2]'>{DOMPurify.sanitize(user.last_name)}</p>
+                                <p className='block text-xl text-[#03AED2] dark:text-[#C996CC]'>{DOMPurify.sanitize(user.last_name)}</p>
                             )}
                             {errors.last_name && <p className="error-text">{errors.last_name}</p>}
                         </div>
                         <div className="data-profile grid grid-cols-2 mb-8 flex items-center">
-                            <label className='block text-xl text-[#03AED2]'>Birthday</label>
+                            <label className='block text-xl text-[#03AED2] dark:text-[#C996CC]'>Birthday</label>
                             {isEditMode ? (
                                 <input
                                     type="date"
                                     name="birthday"
                                     value={formData.birthday}
-                                    className="p-1 pl-3 border border-[#68D2E8] rounded-full w-full text-xl text-[#03AED2]"
+                                    className="p-1 pl-3 border border-[#68D2E8] dark:border-[#C996CC] rounded-full w-full text-xl text-[#03AED2] dark:text-[#C996CC]"
                                     onChange={handleChange}
                                 />
                             ) : (
-                                <p className='block text-xl text-[#03AED2]'>{formatDateToDDMMYYYY(new Date(user.birthday).toISOString().split('T')[0])}</p>
+                                <p className='block text-xl text-[#03AED2] dark:text-[#C996CC]'>{formatDateToDDMMYYYY(new Date(user.birthday).toISOString().split('T')[0])}</p>
                             )}
                             {errors.birthday && <p className="error-text">{errors.birthday}</p>}
                         </div>
                         <div className="data-profile grid grid-cols-2 mb-8 flex items-center">
-                            <label className='block text-xl text-[#03AED2]'>Phone Number</label>
+                            <label className='block text-xl text-[#03AED2] dark:text-[#C996CC]'>Phone Number</label>
                             {isEditMode ? (
                                 <input
                                     type="text"
                                     name="tel"
                                     value={formData.tel}
-                                    className="p-1 pl-3 border border-[#68D2E8] rounded-full w-full text-xl text-[#03AED2]"
+                                    className="p-1 pl-3 border border-[#68D2E8] dark:border-[#C996CC] rounded-full w-full text-xl text-[#03AED2] dark:text-[#C996CC]"
                                     onChange={handleChange}
                                 />
                             ) : (
-                                <p className='block text-xl text-[#03AED2]'>{DOMPurify.sanitize(user.tel)}</p>
+                                <p className='block text-xl text-[#03AED2] dark:text-[#C996CC]'>{DOMPurify.sanitize(user.tel)}</p>
                             )}
                             {errors.tel && <p className="error-text">{errors.tel}</p>}
                         </div>
                         <div className="btn-submit mt-6 max-w-lg w-full flex justify-center">
-                            <button type="button"  className='submit-button bg-[#68D2E8] text-xl text-white rounded-full py-2 px-8 mr-5' onClick={toggleEditMode}>
+                            <button type="button"  className='submit-button bg-[#68D2E8] dark:bg-[#C996CC] text-xl text-white rounded-full py-2 px-8 mr-5' onClick={toggleEditMode}>
                                 {isEditMode ? "Cancel" : "Edit Profile"}
                             </button>
                             {isEditMode && (
-                                <button type="submit"  className='submit-button bg-[#68D2E8] text-xl text-white rounded-full py-2 px-8' disabled={isSubmitting}>
+                                <button type="submit"  className='submit-button bg-[#68D2E8] dark:bg-[#C996CC] text-xl text-white rounded-full py-2 px-8' disabled={isSubmitting}>
                                     {isSubmitting ? "Saving..." : "Save Changes"}
                                 </button>
                             )}

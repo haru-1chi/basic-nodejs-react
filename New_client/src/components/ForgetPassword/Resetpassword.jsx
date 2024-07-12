@@ -37,6 +37,10 @@ const ResetPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      setErrors({ confirmPassword: "Passwords do not match" });
+      return;
+    }
     try {
       const res = await axios.post(
         `http://localhost:8080/auth/users/${formData.token}/reset-password`,

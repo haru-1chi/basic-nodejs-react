@@ -10,6 +10,7 @@ import Verified from './components/Verifiedmail';
 import Forgetpassword from './components/ForgetPassword/Forgetpassword';
 import Resetpassword from './components/ForgetPassword/Resetpassword';
 import Resetsuccess from './components/ForgetPassword/Resetsuccess';
+import ProjectManage from './components/MainPage/ProjectManage';
 
 //components
 
@@ -18,7 +19,7 @@ function App() {
   return (
     <Router>
       <Navbar />
-      <div className="h-dvh bg-[#FEEFAD] flex justify-center">
+      <div className="h-dvh bg-[#FEEFAD] dark:bg-[#1C0C5B] flex justify-center">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/signup" element={<Signup />} />
@@ -28,6 +29,7 @@ function App() {
           <Route path="/forgetpassword" element={<Forgetpassword />} />
           <Route path="/resetpassword" element={<Resetpassword />} />
           <Route path="/resetsuccess" element={<Resetsuccess />} />
+          <Route path="/projectmanage" element={<ProjectManage />} />
         </Routes>
       </div>
     </Router>
