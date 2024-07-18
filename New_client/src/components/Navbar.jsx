@@ -76,10 +76,12 @@ function Navbar() {
                                 {user.role === 'admin' && (
                                     <Link to="/manage-users" className="navbar-link">Manage Users</Link>
                                 )}
+                                <li className='ml-10'><Link to="/projectmanage" className="">Project</Link></li>
                                 <li className='ml-10'><Link to="/userprofile" className="">Profile</Link></li>
                                 <button onClick={handleLogout} className="navbar-button ml-10">Logout</button>
                                 {/* <li className='ml-10'><Link to="" className="">Logout</Link></li> */}
                             </ul>
+
                         </div>
                     ) : (
                         <div className="menu">

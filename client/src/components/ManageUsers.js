@@ -50,7 +50,9 @@ const ManageUsers = () => {
         <h2>Manage Users</h2>
         {error && <p className="error-text">{error}</p>}
         <ul>
+        
           {users.map((user) => (
+            
             <li key={user.profile.userId}>
               <span>
                 {user.profile.first_name} {user.profile.last_name} (
@@ -64,6 +66,7 @@ const ManageUsers = () => {
               </button>
             </li>
           ))}
+
         </ul>
       </div>
     </div>

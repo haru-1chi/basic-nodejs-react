@@ -6,9 +6,9 @@ const TaskAssignSchema = new mongoose.Schema(
       ref: "tasks",
       required: true,
     },
-    userID: {
+    profileId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "profiles",
       required: true,
     },
     projectId: {

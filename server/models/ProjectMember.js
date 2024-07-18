@@ -6,21 +6,18 @@ const ProjectMemberSchema = new mongoose.Schema(
       ref: "projects",
       required: true,
     },
-    userId: {
+    profileId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "profiles",
       required: true,
     },
-    positionId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "positions",
-      required: false,
+    position: {
+      type: String,
       default: null,
     },
     accessId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "accesses",
-      required: false,
       default: null,
     },
   },

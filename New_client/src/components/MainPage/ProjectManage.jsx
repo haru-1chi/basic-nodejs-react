@@ -1,6 +1,6 @@
 import React from 'react';
-import ToolPanel from './LeftPanel';
-import ProjectPanel from './RightPanel';
+import ToolPanel from './ToolPanel';
+import ProjectPanel from './ProjectPanel';
 
 const ProjectManage = () => {
   return (
