@@ -33,6 +33,14 @@ const ProjectPanel = () => {
     setShowNewProjectForm(false);
   };
 
+  const handleUpdateProject = (updatedProject) => {
+    setProjects((prevProjects) =>
+      prevProjects.map((project) =>
+        project._id === updatedProject._id ? updatedProject : project
+      )
+    );
+  };
+
   const handleShowFormToggle = () => {
     setShowNewProjectForm(!showNewProjectForm);
   };
@@ -53,7 +61,7 @@ const ProjectPanel = () => {
 
       <div className="project-list">
         {projects.map((project) => (
-          <ProjectCard key={project.id || project._id} project={project} />
+          <ProjectCard key={project.id || project._id} project={project} onUpdateProject={handleUpdateProject} />
         ))}
       </div>
       {error && <div className="error-message text-red-500">{error}</div>}
