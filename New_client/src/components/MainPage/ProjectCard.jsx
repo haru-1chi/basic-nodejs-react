@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import axios from 'axios';
-const ProjectCard = ({ project, onUpdateProject }) => {
+
+const ProjectCard = ({ project, onUpdateProject, onDeleteProject }) => {
   const [expanded, setExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editProject, setEditProject] = useState({
@@ -24,11 +25,16 @@ const ProjectCard = ({ project, onUpdateProject }) => {
     setEditProject({ ...editProject, [e.target.name]: e.target.value });
   };
 
+  const formatDateToDDMMYYYY = (date) => {
+    const [year, month, day] = date.split('-');
+    return `${day}/${month}/${year}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.put(`http://localhost:8080/user/project/${project.id}`, editProject, {
+      const response = await axios.put(`http://localhost:8080/user/project/${(project.id || project._id)}`, editProject, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
@@ -39,22 +45,41 @@ const ProjectCard = ({ project, onUpdateProject }) => {
     }
   };
 
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(`http://localhost:8080/user/project/${(project.id || project._id)}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        });
+        onDeleteProject(project.id || project._id);
+        setExpanded(false);
+      } catch (error) {
+        console.error('Error deleting project:', error);
+      }
+    }
+  };
+
   return (
     <div className="project-card bg-white dark:bg-[#3D2C8D] px-4 pt-2 pb-4 rounded-lg shadow-md mb-4">
-      <div onClick={handleExpand} className="cursor-pointer">
+      <div className="cursor-pointer">
         <div className='flex justify-end'>
           <h2 className='text-m text-[#03AED2] mr-2' onClick={handleEditToggle}><FaEdit /></h2>
-          <h2 className='text-m text-[#03AED2]'><FaTrashAlt /></h2>
+          <h2 className='text-m text-[#03AED2]' onClick={handleDelete}><FaTrashAlt /></h2>
         </div>
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="project-title text-xl text-[#03AED2]">{project.name}</h3>
-          <p className="project-dates text-[#03AED2]">Start - End Date</p>
+        <div onClick={handleExpand} className="grid grid-cols-2 place-items-start mb-6">
+          <h3 className="project-title text-2xl text-[#03AED2]">{project.name}</h3>
+          <div>
+            <p className="project-dates text-[#03AED2] mb-4">During : {formatDateToDDMMYYYY(new Date(project.since_date).toISOString().split('T')[0])} - {formatDateToDDMMYYYY(new Date(project.due_date).toISOString().split('T')[0])}</p>
+            <p className="project-team text-[#03AED2]">Created by : {project.create_by}</p>
+          </div>
+
         </div>
         <p className="project-description text-[#03AED2]">{project.description}</p>
       </div>
       {expanded && (
         <div className="expanded-content mt-4">
-          <p className="project-team text-[#03AED2]">Created by: {project.create_by}</p>
           <button className="add-task-button bg-[#03AED2] text-white py-1 px-2 rounded-full">+ Add task</button>
           <div className="task-card bg-white dark:bg-[#3D2C8D] p-4 rounded-lg shadow-md mt-4">
             <div className='flex justify-between'>

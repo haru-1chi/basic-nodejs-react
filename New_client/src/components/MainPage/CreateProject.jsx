@@ -37,15 +37,8 @@ const CreateProject = ({ onAddProject }) => {
 
   return (
     <div className="new-project-form bg-white dark:bg-[#3D2C8D] px-4 pt-2 pb-4 rounded-lg shadow-md mb-4">
-      <div className="cursor-pointer">
-        <div className='flex justify-end mb-2'>
-          <h2 className='text-m text-[#03AED2]'><FaTrashAlt /></h2>
-        </div>
-        <p className="project-description text-[#03AED2]"></p>
-      </div>
-
       <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-2 items-center mb-6">
+        <div className="grid grid-cols-2 items-center my-4">
           <input
             type="text"
             name="name"

@@ -36,8 +36,14 @@ const ProjectPanel = () => {
   const handleUpdateProject = (updatedProject) => {
     setProjects((prevProjects) =>
       prevProjects.map((project) =>
-        project._id === updatedProject._id ? updatedProject : project
+        (project.id || project._id) === (updatedProject.id || updatedProject._id) ? updatedProject : project
       )
+    );
+  };
+
+  const handleDeleteProject = (projectId) => {
+    setProjects((prevProjects) =>
+      prevProjects.filter((project) => (project.id || project._id) !== projectId)
     );
   };
 
@@ -61,7 +67,7 @@ const ProjectPanel = () => {
 
       <div className="project-list">
         {projects.map((project) => (
-          <ProjectCard key={project.id || project._id} project={project} onUpdateProject={handleUpdateProject} />
+          <ProjectCard key={project.id || project._id} project={project} onUpdateProject={handleUpdateProject} onDeleteProject={handleDeleteProject}/>
         ))}
       </div>
       {error && <div className="error-message text-red-500">{error}</div>}

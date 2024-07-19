@@ -8,16 +8,16 @@ const TaskAssign = require('../models/TaskAssign');
 exports.createProject = async (req, res) => {
   const { name, description, since_date, due_date } = req.body;
   const userId = req.user._id;
-  const profileId = await Profile.findOne({ userId: userId }).select("_id");
+  const profileId = await Profile.findOne({ userId }).select("_id");
 
   try {
-    const newProject = new Project({ name, description, since_date, due_date });
+    const newProject = new Project({ name, description, since_date, due_date }); //เพิ่ม validate, เช็คการกำหนด timeline of project
     const savedProject = await newProject.save();
 
     const newProjectMember = new ProjectMember({
       projectId: savedProject._id,
       profileId,
-      position: "leader",
+      position: "Leader",
       accessId: "6692131dbad9b54854dcb58b",
     });
     await newProjectMember.save();
@@ -76,11 +76,12 @@ exports.getListProject = async (req, res) => {
           id: project._id,
           name: project.name,
           description: project.description,
+          since_date: project.since_date,
+          due_date: project.due_date,
           create_by: createBy,
         };
       })
     );
-
     res.status(200).json(projectList);
   } catch (error) {
     res.status(500).json({
@@ -151,28 +152,23 @@ exports.updateProject = async (req, res) => {
     const { projectid } = req.params;
     const { name, description, since_date, due_date } = req.body;
 
-    // Find the project by ID
-    const project = await Project.findById(projectid);
-    if (!project) {
+    const updatedProject = await Project.findByIdAndUpdate(
+      projectid,
+      { name, description, since_date, due_date },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedProject) {
       return res.status(404).json({
         status: "error",
         message: "Project not found",
       });
     }
 
-    // Update project fields if they are provided in the request body
-    if (name) project.name = name;
-    if (description) project.description = description;
-    if (since_date) project.since_date = new Date(since_date);
-    if (due_date) project.due_date = new Date(due_date);
-
-    // Save the updated project
-    await project.save();
-
     res.status(200).json({
       status: "success",
       message: "Project updated successfully",
-      data: project,
+      data: updatedProject,
     });
   } catch (error) {
     res.status(500).json({
