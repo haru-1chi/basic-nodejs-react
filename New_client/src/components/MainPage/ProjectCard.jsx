@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import axios from 'axios';
 
 const ProjectCard = ({ project, onUpdateProject, onDeleteProject }) => {
   const [expanded, setExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [newMember, setNewMember] = useState('');
+  const [members, setMembers] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [accessTypes, setAccessTypes] = useState([]);
+  const [selectedPosition, setSelectedPosition] = useState('');
+  const [selectedAccessId, setSelectedAccessId] = useState('');
+  const [selectedProfileId, setSelectedProfileId] = useState("");
+
   const [editProject, setEditProject] = useState({
     _id: project.id || project._id,
     name: project.name,
@@ -12,6 +20,38 @@ const ProjectCard = ({ project, onUpdateProject, onDeleteProject }) => {
     since_date: project.since_date ? new Date(project.since_date).toISOString().split('T')[0] : '',
     due_date: project.due_date ? new Date(project.due_date).toISOString().split('T')[0] : ''
   });
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`http://localhost:8080/user/getdetailproject/${(project.id || project._id)}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        });
+        setMembers(response.data.team_members);
+      } catch (error) {
+        console.error('Error fetching project members:', error);
+      }
+    };
+
+    const fetchAccessTypes = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`http://localhost:8080/user/getaccess`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        });
+        setAccessTypes(response.data.data);
+      } catch (error) {
+        console.error('Error fetching access types:', error);
+      }
+    };
+
+    fetchMembers();
+    fetchAccessTypes();
+  }, [(project.id || project._id)]);
+
 
   const handleExpand = () => setExpanded((prevExpanded) => !prevExpanded);
 
@@ -56,6 +96,55 @@ const ProjectCard = ({ project, onUpdateProject, onDeleteProject }) => {
         console.error('Error deleting project:', error);
       }
     }
+  };
+
+  const handleAddMember = async () => {
+    if (selectedProfileId  && selectedPosition && selectedAccessId) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.post(`http://localhost:8080/user/project/${(project.id || project._id)}/addMember`, {
+          profileId: selectedProfileId,
+          position: selectedPosition,
+          accessId: selectedAccessId,
+        }, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        });
+        setMembers([...members, response.data.data]);
+        setNewMember('');
+        setSelectedProfileId('');
+        setSelectedPosition('');
+        setSelectedAccessId('');
+        setSearchResults([]); // Clear search results after adding the member
+      } catch (error) {
+        console.error('Error adding member:', error.response ? error.response.data : error.message);
+      }
+    }
+  };
+
+  const handleSearchChange = async (e) => {
+    const query = e.target.value;
+    setNewMember(query);
+    if (query.length > 0) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`http://localhost:8080/user/search?query=${query}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        });
+        setSearchResults(response.data.users);
+      } catch (error) {
+        console.error('Error searching for users:', error);
+      }
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const handleSelectUser = (user) => {
+    setNewMember(user.first_name);
+    setSelectedProfileId(user._id);
+    setSearchResults([]);
   };
 
   return (
@@ -112,19 +201,59 @@ const ProjectCard = ({ project, onUpdateProject, onDeleteProject }) => {
                   </div>
                   <div className='place-items-start'>
                     <p className='text-white'>Team member</p>
-                    <p className='text-white'>Created by : {project.create_by}</p>
-
+                    <input
+                      type="text"
+                      value={newMember}
+                      onChange={handleSearchChange}
+                      placeholder="Add new member"
+                      className="input-field p-1 pl-3 border border-[#68D2E8] dark:border-[#C996CC] rounded-full max-w-lg text-xl text-[#03AED2] dark:text-[#C996CC]"
+                    />
+                    <ul>
+                      {searchResults.map((user, index) => (
+                        <li key={index} className='text-white cursor-pointer' onClick={() => handleSelectUser(user)}>{user.first_name}</li>
+                      ))}
+                    </ul>
+                    <input
+                      type="text"
+                      value={selectedPosition}
+                      onChange={(e) => setSelectedPosition(e.target.value)}
+                      placeholder="Position"
+                      className="input-field mt-2 p-1 pl-3 border border-[#68D2E8] dark:border-[#C996CC] rounded-full max-w-lg text-xl text-[#03AED2] dark:text-[#C996CC]"
+                    />
+                    <select
+                      value={selectedAccessId}
+                      onChange={(e) => setSelectedAccessId(e.target.value)}
+                      className="input-field mt-2 p-1 pl-3 border border-[#68D2E8] dark:border-[#C996CC] rounded-full max-w-lg text-xl text-[#03AED2] dark:text-[#C996CC]"
+                    >
+                      <option value="" disabled>Select Access Type</option>
+                      {accessTypes.map((access) => (
+                        <option key={access._id} value={access._id}>{access.name}</option>
+                      ))}
+                    </select>
+                    <button type="button" onClick={handleAddMember} className="bg-[#03AED2] text-white py-1 px-2 rounded-full mt-2">Add</button>
+                    <ul>
+                      {members.map((member, index) => (
+                        <li key={index} className='text-white'>{member.first_name}</li>
+                      ))}
+                    </ul>
                   </div>
-
                 </div>
               ) : (
                 <div className='grid grid-cols-2'>
-                  <p className="project-dates text-[#03AED2] mb-4">During : {formatDateToDDMMYYYY(new Date(project.since_date).toISOString().split('T')[0])} - {formatDateToDDMMYYYY(new Date(project.due_date).toISOString().split('T')[0])}</p>
-                  <p className="project-team text-[#03AED2] mb-4">Created by : {project.create_by}</p>
+                  <div>
+                    <p className="project-dates text-[#03AED2] mb-4">During : {formatDateToDDMMYYYY(new Date(project.since_date).toISOString().split('T')[0])} - {formatDateToDDMMYYYY(new Date(project.due_date).toISOString().split('T')[0])}</p>
+                  </div>
+                  <div>
+                    <p className="project-team text-[#03AED2] mb-4">Team members:</p>
+                    <ul>
+                      {members.map((member, index) => (
+                        <li key={index} className='text-[#03AED2]'>{member.first_name}</li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               )}
             </div>
-
           </div>
           {isEditing ? (
             <textarea
@@ -159,14 +288,14 @@ const ProjectCard = ({ project, onUpdateProject, onDeleteProject }) => {
               </div>
               <div className="grid grid-cols-2">
                 <p className="task-dates text-[#03AED2]">Due date</p>
-                <p className="task-assign text-[#03AED2]">Assigned to</p>
+                <p className="task-assign text-[#03AED2]">Assign to :</p>
               </div>
-              <p className="task-description text-[#03AED2]">description</p>
+              <p className="task-status text-[#03AED2]">Status</p>
             </div>
           </div>
         )
       }
-    </div >
+    </div>
   );
 };
 
