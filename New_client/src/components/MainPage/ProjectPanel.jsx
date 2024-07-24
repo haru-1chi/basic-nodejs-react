@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { fetchProjects } from '../api';
 import ProjectCard from './ProjectCard';
 import CreateProject from './CreateProject';
 
@@ -9,21 +9,16 @@ const ProjectPanel = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:8080/user/getlistproject", {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        });
-        setProjects(res.data || []);
+        const data = await fetchProjects();
+        setProjects(data);
       } catch (err) {
         setError("Error fetching projects");
         console.error(err);
       }
     };
-
-    fetchProjects();
+    fetchData();
   }, []);
 
   const handleAddProject = (newProject) => {

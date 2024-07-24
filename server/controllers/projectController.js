@@ -2,15 +2,27 @@ const Project = require("../models/Project");
 const ProjectMember = require("../models/ProjectMember");
 const Profile = require("../models/Profile");
 const Access = require("../models/Access");
-const Task = require('../models/Task');
-const TaskAssign = require('../models/TaskAssign');
+const Task = require("../models/Task");
+const TaskAssign = require("../models/TaskAssign");
 
+const createErrorResponse = (res, status, message) => {
+  res.status(status).json({
+    status: "error",
+    message,
+  });
+};
+//แก้ชื่อตัวแปรจาก parameter id => Id
 exports.createProject = async (req, res) => {
   const { name, description, since_date, due_date } = req.body;
   const userId = req.user._id;
-  const profileId = await Profile.findOne({ userId }).select("_id");
 
   try {
+    const profile = await Profile.findOne({ userId }).select("_id");
+    if (!profile) {
+      return createErrorResponse(res, 404, "Profile not found");
+    }
+    const profileId = profile._id;
+
     const newProject = new Project({ name, description, since_date, due_date }); //เพิ่ม validate, เช็คการกำหนด timeline of project
     const savedProject = await newProject.save();
 
@@ -29,37 +41,29 @@ exports.createProject = async (req, res) => {
       newProjectMember,
     });
   } catch (err) {
-    res.status(500).json({
-      status: "error",
-      message: err.message || "Internal Server Error",
-    });
+    createErrorResponse(res, 500, err.message || "Internal Server Error");
   }
 };
 
 exports.getListProject = async (req, res) => {
   try {
     const userId = req.user._id;
-
-    // Find the profile ID of the current user
     const profile = await Profile.findOne({ userId }).select("_id");
+    if (!profile) {
+      return createErrorResponse(res, 404, "Profile not found");
+    }
     const profileId = profile._id;
 
-    // Find all project memberships for the user
     const userProjects = await ProjectMember.find({ profileId }).lean();
-
     if (!userProjects.length) {
       return res.status(200).json([]);
     }
 
-    // Extract project IDs
     const projectIds = userProjects.map((pm) => pm.projectId);
-
-    // Find projects by these IDs and sort them by the latest updatedAt field
     const projects = await Project.find({ _id: { $in: projectIds } })
-                                  .sort({ updatedAt: -1 })
-                                  .lean();
+      .sort({ updatedAt: -1 })
+      .lean();
 
-    // Generate project list with owner details
     const projectList = await Promise.all(
       projects.map(async (project) => {
         const projectOwner = await ProjectMember.findOne({
@@ -84,34 +88,24 @@ exports.getListProject = async (req, res) => {
     );
     res.status(200).json(projectList);
   } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: error.message || "Internal Server Error",
-    });
+    createErrorResponse(res, 500, error.message || "Internal Server Error");
   }
 };
-
 
 exports.getDetailProject = async (req, res) => {
   try {
     const { projectId } = req.params;
 
-    // Find the project by its ID
     const project = await Project.findById(projectId).lean();
     if (!project) {
-      return res.status(404).json({
-        status: "error",
-        message: "Project not found",
-      });
+      return createErrorResponse(res, 404, "Project not found");
     }
 
-    // Find the project members
     const projectMembers = await ProjectMember.find({ projectId: project._id })
       .populate("profileId", "first_name last_name")
       .populate("accessId", "name")
       .lean();
 
-    // Construct the team member details
     const teamMembers = await Promise.all(
       projectMembers.map(async (member) => {
         const profile = await Profile.findOne({ _id: member.profileId }).select(
@@ -128,7 +122,6 @@ exports.getDetailProject = async (req, res) => {
       })
     );
 
-    // Construct the response object
     const projectDetails = {
       id: project._id,
       name: project.name,
@@ -140,10 +133,7 @@ exports.getDetailProject = async (req, res) => {
 
     res.status(200).json(projectDetails);
   } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: error.message || "Internal Server Error",
-    });
+    createErrorResponse(res, 500, error.message || "Internal Server Error");
   }
 };
 
@@ -159,10 +149,7 @@ exports.updateProject = async (req, res) => {
     );
 
     if (!updatedProject) {
-      return res.status(404).json({
-        status: "error",
-        message: "Project not found",
-      });
+      return createErrorResponse(res, 404, "Project not found");
     }
 
     res.status(200).json({
@@ -171,10 +158,7 @@ exports.updateProject = async (req, res) => {
       data: updatedProject,
     });
   } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: error.message || "Internal Server Error",
-    });
+    createErrorResponse(res, 500, error.message || "Internal Server Error");
   }
 };
 
@@ -182,19 +166,12 @@ exports.deleteProject = async (req, res) => {
   try {
     const { projectid } = req.params;
 
-    // Find the project by ID
     const project = await Project.findById(projectid);
     if (!project) {
-      return res.status(404).json({
-        status: "error",
-        message: "Project not found",
-      });
+      return createErrorResponse(res, 404, "Project not found");
     }
 
-    // Delete related project member records
     await ProjectMember.deleteMany({ projectId: projectid });
-
-    // Delete the project
     await Project.findByIdAndDelete(projectid);
 
     res.status(200).json({
@@ -202,10 +179,7 @@ exports.deleteProject = async (req, res) => {
       message: "Project and related members deleted successfully",
     });
   } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: error.message || "Internal Server Error",
-    });
+    createErrorResponse(res, 500, error.message || "Internal Server Error");
   }
 };
 
@@ -214,49 +188,32 @@ exports.addMember = async (req, res) => {
     const { projectId } = req.params;
     const { profileId, position, accessId } = req.body;
 
-    // Validate input
     if (!profileId || !position || !accessId) {
-      return res.status(400).json({
-        status: "error",
-        message: "All fields are required",
-      });
+      return createErrorResponse(res, 400, "All fields are required");
     }
-
-    // Find the profile
     const profile = await Profile.findById(profileId);
+
     if (!profile) {
-      return res.status(404).json({
-        status: "error",
-        message: "Profile not found",
-      });
+      return createErrorResponse(res, 404, "Profile not found");
     }
-
-    // Validate the access ID
     const access = await Access.findById(accessId);
+
     if (!access) {
-      return res.status(404).json({
-        status: "error",
-        message: "Access type not found",
-      });
+      return createErrorResponse(res, 404, "Access type not found");
     }
 
-    // Check if the user is already a member of the project
     const existingMember = await ProjectMember.findOne({
       projectId,
       profileId,
     });
     if (existingMember) {
-      return res.status(400).json({
-        status: "error",
-        message: "User is already a member of this project",
-      });
+      return createErrorResponse(res, 400, "User is already a member of this project");
     }
 
-    // Create a new project member record
     const newMember = new ProjectMember({
       projectId,
       profileId,
-      position: position,
+      position,
       accessId,
     });
 
@@ -268,16 +225,13 @@ exports.addMember = async (req, res) => {
       data: {
         id: newMember._id,
         projectId: newMember.projectId,
-        userId: newMember.userId,
+        profileId: newMember.profileId,
         position: newMember.position,
         accessId: newMember.accessId,
       },
     });
   } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: error.message || "Internal Server Error",
-    });
+    createErrorResponse(res, 500, error.message || "Internal Server Error");
   }
 };
 
