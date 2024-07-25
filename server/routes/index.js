@@ -1,46 +1,35 @@
-const express = require('express');
-const authRoutes = require('./authRoutes');
-const adminRoutes = require('./adminRoutes');
-const profileRoutes = require('./profileRoutes');
-// const { Verify, VerifyRole } = require('../middleware/verify');
+const express = require("express");
+const authRoutes = require("./authRoutes");
+const adminRoutes = require("./adminRoutes");
+const profileRoutes = require("./profileRoutes");
+const { errorHandler, notFoundHandler } = require("../middleware/errorHandler");
+const rateLimit = require("express-rate-limit");
 const app = express();
 
-app.disable("x-powered-by"); // Reduce fingerprinting (optional)
+app.disable("x-powered-by");
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: {
+    status: "error",
+    message: "Too many requests, please try again later.",
+  },
+});
+app.use(limiter);
 
-// Home route with the GET method and a handler
 app.get("/home", (req, res) => {
-    try {
-        res.status(200).json({
-            status: "success",
-            message: "Welcome to our API homepage!",
-        });
-    } catch (err) {
-        res.status(500).json({
-            status: "error",
-            message: "Internal Server Error",
-        });
-    }
+  res.status(200).json({
+    status: "success",
+    message: "Welcome to our API homepage!",
+  });
 });
 
-// app.get("/user", Verify, (req, res) => {
-//     res.status(200).json({
-//         status: "success",
-//         message: "Welcome to the your Dashboard!",
-//         user: req.user // Return user data
-//     });
-// });
+app.use("/auth", authRoutes);
+app.use("/user", profileRoutes);
+app.use("/admin", adminRoutes);
 
-// app.get("/admin", Verify, VerifyRole, (req, res) => {
-//     res.status(200).json({
-//         status: "success",
-//         message: "Welcome to the Admin portal!",
-//     });
-// });
-
-// Use auth routes
-app.use('/auth', authRoutes);
-app.use('/user', profileRoutes);
-app.use('/admin', adminRoutes);
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 module.exports = app;

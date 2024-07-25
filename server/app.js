@@ -2,11 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
+const helmet = require('helmet');
 const { PORT, URI } = require('./config/index');
 const appRoutes = require('./routes/index');
 const profileRoutes = require('./routes/profileRoutes');
 const adminRoutes = require('./routes/adminRoutes');
-const helmet = require('helmet');
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+
 // === 1 - CREATE SERVER ===
 const app = express();
 
@@ -19,12 +21,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.json()); // Parse JSON bodies
-
-app.disable("x-powered-by"); // Reduce fingerprinting
-app.use(cookieParser());
-app.use(express.urlencoded({ extended: false }));
+app.use(helmet());
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 // === 2 - CONNECT DATABASE ===
 // Set up mongoose's promise to global promise
@@ -43,9 +43,12 @@ mongoose
 app.use(appRoutes);
 app.use(profileRoutes);
 app.use('/admin', adminRoutes);
-app.use(cookieParser());
-app.use(helmet());
-// === 5 - START UP SERVER ===
+
+// === 5 - ERROR HANDLING ===
+app.use(notFoundHandler); // Handle 404 errors
+app.use(errorHandler); // Centralized error handling middleware
+
+// === 6 - START UP SERVER ===
 app.listen(PORT, () =>
     console.log(`Server running on http://localhost:${PORT}`)
 );
