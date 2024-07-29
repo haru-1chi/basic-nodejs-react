@@ -21,11 +21,11 @@ router.use(Verify);
 router.get("/profile", getProfile);
 router.post("/updateprofile", updateProfile);
 router.post("/newproject", createProject);
-router.get("/user/getlistproject", getListProject);
-router.get("/user/getdetailproject/:projectId", getDetailProject);
+router.get("/getlistproject", getListProject);
+router.get("/getdetailproject/:projectId", getDetailProject);
 router.post("/project/:projectId/addMember", addMember);
-router.put("/user/project/:projectid", Verify, updateProject); //
-router.delete("/user/project/:projectid", Verify, deleteProject); //
+router.put("/project/:projectId", Verify, updateProject); //
+router.delete("/project/:projectId", Verify, deleteProject); //
 
 router.get("/search", async (req, res) => {
   try {

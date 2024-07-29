@@ -139,11 +139,11 @@ exports.getDetailProject = async (req, res) => {
 
 exports.updateProject = async (req, res) => {
   try {
-    const { projectid } = req.params;
+    const { projectId } = req.params;
     const { name, description, since_date, due_date } = req.body;
 
     const updatedProject = await Project.findByIdAndUpdate(
-      projectid,
+      projectId,
       { name, description, since_date, due_date },
       { new: true, runValidators: true }
     );
@@ -164,15 +164,15 @@ exports.updateProject = async (req, res) => {
 
 exports.deleteProject = async (req, res) => {
   try {
-    const { projectid } = req.params;
+    const { projectId } = req.params;
 
-    const project = await Project.findById(projectid);
+    const project = await Project.findById(projectId);
     if (!project) {
       return createErrorResponse(res, 404, "Project not found");
     }
 
-    await ProjectMember.deleteMany({ projectId: projectid });
-    await Project.findByIdAndDelete(projectid);
+    await ProjectMember.deleteMany({ projectId: projectId });
+    await Project.findByIdAndDelete(projectId);
 
     res.status(200).json({
       status: "success",

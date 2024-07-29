@@ -5,7 +5,7 @@ import Navbar from './components/Navbar'
 import Home from './components/Home';
 import Signup from './components/Signup';
 import Login from './components/Login';
-import Userprofile from './components/Userprofile';
+import Userprofile from './components/UserProfile/Userprofile';
 import Verified from './components/Verifiedmail';
 import Forgetpassword from './components/ForgetPassword/Forgetpassword';
 import Resetpassword from './components/ForgetPassword/Resetpassword';

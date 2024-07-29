@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { registerUser } from './api';
+import { validateSignupForm } from './utils/validation';
 
 const Signup = () => {
     const [formData, setFormData] = useState({
@@ -10,68 +11,33 @@ const Signup = () => {
     });
 
     const [errors, setErrors] = useState({});
-    const [successMessage, setSuccessMessage] = useState('');
+    const [message, setMessage] = useState('');
 
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
-
-    const validateForm = () => {
-        let formErrors = {};
-
-        if (!formData.username) {
-            formErrors.username = "Your username is required";
-        } else if (formData.username.length > 25) {
-            formErrors.username = "Username cannot exceed 25 characters";
-        }
-
-        if (!formData.email) {
-            formErrors.email = "Your email is required";
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            formErrors.email = "Enter a valid email address";
-        }
-
-        if (!formData.password) {
-            formErrors.password = "Your password is required";
-        } else if (formData.password.length < 8) {
-            formErrors.password = "Password must be at least 8 characters long";
-        }
-
-        if (!formData.confirmPassword) {
-            formErrors.confirmPassword = "Your confirmPassword is required";
-        }
-
-        if (formData.password !== formData.confirmPassword) {
-            formErrors.confirmPassword = "Passwords do not match";
-        }
-
-        return formErrors;
+        const { name, value } = e.target;
+        setFormData(prevData => ({
+            ...prevData,
+            [name]: value
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const formErrors = validateForm();
+        const formErrors = validateSignupForm(formData);
         if (Object.keys(formErrors).length > 0) {
             setErrors(formErrors);
             return;
         }
 
         try {
-            const { ...submitData } = formData;
-            const res = await axios.post('http://localhost:8080/auth/register', submitData);
-            console.log('Registration successful', res.data);
-
-            setSuccessMessage('Registration successful! We sent a verification email to you. Please check your mail and verify.');
-
+            const data = await registerUser(formData);
+            setMessage({ type: 'success', text: 'Registration successful! Please check your email for verification.' });
             setErrors({});
         } catch (err) {
             console.error('Error during registration', err.response?.data || err.message);
             setErrors(err.response?.data.errors || {});
-            setSuccessMessage('');
+            setMessage({ type: 'error', text: 'Registration failed. Please try again.' });
         }
     };
 
@@ -120,7 +86,7 @@ const Signup = () => {
                             onChange={handleChange} />
                         {errors.confirmPassword && <p className="error-text">{errors.confirmPassword}</p>}
                     </div>
-                    {successMessage && <p className="success-text">{successMessage}</p>}
+                    {message && <p className={message.type === 'success' ? "success-text" : "error-text"}>{message.text}</p>}
                     <div className="btn-submit mt-6 max-w-lg w-full flex justify-center">
                         <button type='submit' className='submit-button bg-[#68D2E8] dark:bg-[#C996CC] text-xl text-white rounded-full py-2 px-8'>Sign up</button>
                     </div>

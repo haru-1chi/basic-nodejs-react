@@ -8,15 +8,15 @@ const app = express();
 
 app.disable("x-powered-by");
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: {
-    status: "error",
-    message: "Too many requests, please try again later.",
-  },
-});
-app.use(limiter);
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   max: 100, // limit each IP to 100 requests per windowMs
+//   message: {
+//     status: "error",
+//     message: "Too many requests, please try again later.",
+//   },
+// });
+// app.use(limiter);
 
 app.get("/home", (req, res) => {
   res.status(200).json({

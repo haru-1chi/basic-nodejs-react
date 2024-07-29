@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { validateForm  } from './utils/validation';
 
 function Login() {
     const [formData, setFormData] = useState({
@@ -17,26 +18,10 @@ function Login() {
         });
     };
 
-    const validateForm = () => {
-        let formErrors = {};
-
-        if (!formData.email) {
-            formErrors.email = "Your email is required";
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            formErrors.email = "Enter a valid email address";
-        }
-
-        if (!formData.password) {
-            formErrors.password = "Your password is required";
-        }
-
-        return formErrors;
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const formErrors = validateForm();
+        const formErrors = validateForm(formData);
         if (Object.keys(formErrors).length > 0) {
             setErrors(formErrors);
             return;
@@ -55,11 +40,7 @@ function Login() {
             window.location.href = '/';
         } catch (err) {
             console.error('Error during login', err.response?.data || err.message);
-            if (err.response && err.response.status === 401) {
-                setErrors({ general: err.response.data.message });
-            } else {
-                setErrors(err.response?.data.errors || {});
-            }
+            setErrors(err.response?.data.errors || { general: err.response?.data.message });
         }
     };
 
