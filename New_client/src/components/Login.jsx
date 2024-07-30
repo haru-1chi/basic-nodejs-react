@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import axios from 'axios';
+import { loginUser } from './api';
 import { Link } from 'react-router-dom';
-import { validateForm  } from './utils/validation';
+import { validateForm } from './utils/validation';
 
 function Login() {
     const [formData, setFormData] = useState({
@@ -28,15 +28,14 @@ function Login() {
         }
 
         try {
-            const res = await axios.post('http://localhost:8080/auth/login', formData, {
-                withCredentials: true
-            });
-            console.log('Login successful', res.data);
+            const res = await loginUser(formData);
 
-            // Store token in localStorage
-            localStorage.setItem('token', res.data.token);
+            if (res && res.token) {
+                localStorage.setItem('token', res.token);
+            } else {
+                throw new Error('Token not found in response');
+            }
 
-            // Redirect to home page
             window.location.href = '/';
         } catch (err) {
             console.error('Error during login', err.response?.data || err.message);

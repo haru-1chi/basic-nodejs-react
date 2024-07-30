@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import ProfilePic from '../../assets/img/profile.jpg'
 import ProfileView from './ProfileView';
 import ProfileForm from './ProfileForm';
 import { fetchUserData, updateUserData } from '../api';
 import { useNavigate } from 'react-router-dom';
-import ProfilePic from '../../assets/img/profile.jpg'
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
     birthday: "",
     tel: "",
   });
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+
   const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
@@ -24,13 +24,10 @@ const UserProfile = () => {
       try {
         const userData = await fetchUserData();
         setUser(userData);
-        const formattedBirthday = userData.birthday
-          ? new Date(userData.birthday).toISOString().split('T')[0]
-          : '';
         setFormData({
           first_name: userData.first_name,
           last_name: userData.last_name,
-          birthday: formattedBirthday,
+          birthday: userData.birthday ? new Date(userData.birthday).toISOString().split('T')[0] : '',
           tel: userData.tel,
         });
       } catch (err) {

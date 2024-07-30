@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { createProjects } from '../api';
 
 const CreateProject = ({ onAddProject }) => {
   const [newProject, setNewProject] = useState({
@@ -16,12 +16,7 @@ const CreateProject = ({ onAddProject }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.post('http://localhost:8080/newproject', newProject, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
-      const createdProject = response.data.savedProject;
+      const createdProject = await createProjects(newProject)
       onAddProject(createdProject);
       setNewProject({
         name: '',

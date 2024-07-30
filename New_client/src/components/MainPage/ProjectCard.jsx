@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
-import { fetchProjectMembers, fetchAccessTypes } from '../api';
-import axios from 'axios';
+import { fetchProjectMembers, fetchAccessTypes, deleteProjects } from '../api';
 
 import EditProjectForm from './EditProjectForm';
 import ProjectDetails from './ProjectDetails';
@@ -34,11 +33,7 @@ const ProjectCard = ({ project, onUpdateProject, onDeleteProject }) => {
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       try {
-        const token = localStorage.getItem("token");
-        await axios.delete(`http://localhost:8080/user/project/${(project.id || project._id)}`, {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        });
+        await deleteProjects(project.id || project._id)
         onDeleteProject(project.id || project._id);
         setExpanded(false);
       } catch (error) {

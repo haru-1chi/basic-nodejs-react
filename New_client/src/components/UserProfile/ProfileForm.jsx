@@ -1,4 +1,5 @@
 import React from 'react';
+import ProfileField from './ProfileField';
 
 const ProfileForm = ({ formData, handleChange, handleSubmit, errors, isSubmitting, toggleEditMode }) => (
     <>
@@ -17,20 +18,6 @@ const ProfileForm = ({ formData, handleChange, handleSubmit, errors, isSubmittin
             </div>
         </form>
     </>
-);
-
-const ProfileField = ({ label, name, type = "text", value, onChange, error }) => (
-    <div className="data-profile grid grid-cols-2 mb-8 flex items-center">
-        <label className='block text-xl text-[#03AED2] dark:text-[#C996CC]'>{label}</label>
-        <input
-            type={type}
-            name={name}
-            value={value}
-            className="p-1 pl-3 border border-[#68D2E8] dark:border-[#C996CC] rounded-full w-full text-xl text-[#03AED2] dark:text-[#C996CC]"
-            onChange={onChange}
-        />
-        {error && <p className="error-text">{error}</p>}
-    </div>
 );
 
 export default ProfileForm;

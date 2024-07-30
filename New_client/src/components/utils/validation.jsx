@@ -32,3 +32,19 @@ export const validateForm = (formData) => {
 
     return errors;
 };
+
+export const validateEmail = (email) => {
+    if (!email) {
+        return "Your email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+        return "Enter a valid email address";
+    }
+    return null;
+};
+
+export const validatePasswords = (password, confirmPassword) => {
+    if (password !== confirmPassword) {
+        return { confirmPassword: "Passwords do not match" };
+    }
+    return null;
+};

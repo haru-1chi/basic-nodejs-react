@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { addProjectMember, updateProjects, searchMember} from '../api';
 
 const EditProjectForm = ({ project, members, accessTypes, onUpdateProject, setIsEditing }) => {
   const [editProject, setEditProject] = useState({
@@ -26,16 +26,13 @@ const EditProjectForm = ({ project, members, accessTypes, onUpdateProject, setIs
     e.preventDefault();
     if (selectedProfileId && selectedPosition && selectedAccessId) {
       try {
-        const token = localStorage.getItem("token");
-        const response = await axios.post(`http://localhost:8080/user/project/${(project.id || project._id)}/addMember`, {
+        const memberData = {
           profileId: selectedProfileId,
           position: selectedPosition,
           accessId: selectedAccessId,
-        }, {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        });
-        onUpdateProject(response.data.data);
+        };
+        const res = await addProjectMember(project.id || project._id, memberData);
+        onUpdateProject(res);
         setNewMember('');
         setSelectedProfileId('');
         setSelectedPosition('');
@@ -51,12 +48,8 @@ const EditProjectForm = ({ project, members, accessTypes, onUpdateProject, setIs
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.put(`http://localhost:8080/user/project/${(editProject._id)}`, editProject, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
-      onUpdateProject(response.data.data);
+      const res = await updateProjects(editProject._id, editProject)
+      onUpdateProject(res);
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating project:', error);
@@ -68,12 +61,8 @@ const EditProjectForm = ({ project, members, accessTypes, onUpdateProject, setIs
     setNewMember(query);
     if (query.length > 0) {
       try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(`http://localhost:8080/user/search?query=${query}`, {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        });
-        setSearchResults(response.data.users);
+        const res = await searchMember(query)
+        setSearchResults(res);
       } catch (error) {
         console.error('Error searching for users:', error);
       }

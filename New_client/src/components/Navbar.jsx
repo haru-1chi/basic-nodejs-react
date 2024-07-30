@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { fetchUserData } from './api';
 
 const getToken = () => localStorage.getItem('token');
 const getTheme = () => localStorage.getItem('theme');
@@ -18,11 +18,8 @@ function Navbar() {
             const token = getToken();
             if (token) {
                 try {
-                    const res = await axios.get('http://localhost:8080/user/profile', {
-                        headers: { 'Authorization': `Bearer ${token}` },
-                        withCredentials: true
-                    });
-                    setUser(res.data.data);
+                    const userData = await fetchUserData();
+                    setUser(userData);
                 } catch (err) {
                     console.error('Error fetching user profile', err);
                 }
@@ -38,9 +35,7 @@ function Navbar() {
 
     const handleLogout = async () => {
         try {
-            await axios.get('http://localhost:8080/auth/logout', {
-                withCredentials: true
-            });
+            await fetchUserData();
             localStorage.removeItem('token');
             window.location.href = '/login';
         } catch (err) {
